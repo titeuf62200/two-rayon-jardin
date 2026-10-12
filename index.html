@@ -11,37 +11,110 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf3e9}.tw
 </style>
 </head>
 <body>
-<iframe class="two-app-frame" src="app.html?v=20261012-2" title="TWO Rayon Jardin" allow="fullscreen"></iframe>
+<iframe class="two-app-frame" src="app.html?v=20261012-3" title="TWO Rayon Jardin" allow="fullscreen"></iframe>
 <div class="topbar auth-shellbar" aria-label="Compte TWO"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="auth.js?v=20261012-3"></script>
 <script>
 (function(){
   const frame=document.querySelector('.two-app-frame');
+
+  function escapeHtml(value){
+    return String(value||'').replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]});
+  }
+
+  function formatAsPowerPointPoints(el){
+    if(!el)return;
+    const raw=(el.textContent||'').trim();
+    if(!raw){el.innerHTML='';return;}
+    const lines=raw.split(/\n+/).map(function(s){return s.trim()}).filter(Boolean);
+    if(lines.length<2){
+      el.innerHTML='<span class="two-slide-paragraph">'+escapeHtml(raw)+'</span>';
+      return;
+    }
+    const cleaned=lines.map(function(line){return line.replace(/^\s*(?:[-•–—]|\d+[.)-])\s*/,'')});
+    el.innerHTML='<ul class="two-slide-points">'+cleaned.map(function(line){return '<li>'+escapeHtml(line)+'</li>'}).join('')+'</ul>';
+  }
+
+  function formatLectureSlide(doc){
+    formatAsPowerPointPoints(doc.getElementById('detailEconomic'));
+    formatAsPowerPointPoints(doc.getElementById('detailClient'));
+  }
+
   function tunePreparationEditor(){
     const doc=frame.contentDocument;
+    const win=frame.contentWindow;
     if(!doc||!doc.head)return;
+
     const workUpload=doc.getElementById('fileWork')?.closest('.upl');
     const stepsField=doc.getElementById('fSteps')?.closest('.field');
     workUpload?.classList.add('two-editor-hidden');
     stepsField?.classList.add('two-editor-hidden');
-    if(doc.getElementById('two-preparation-editor-tuning'))return;
-    const style=doc.createElement('style');
-    style.id='two-preparation-editor-tuning';
-    style.textContent=`
-      #tab-content .two-editor-hidden{display:none!important}
-      #tab-content .upload-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;margin:16px 0!important}
-      #tab-content .upl{padding:10px!important;min-width:0}
-      #tab-content .thumb{height:clamp(220px,24vw,340px)!important;padding:8px;background:#eef2eb!important}
-      #tab-content .thumb img{width:100%!important;height:100%!important;object-fit:contain!important;background:#f7f9f5!important;border-radius:8px}
-      #tab-content .upl label{margin-top:9px!important;font-size:11px!important}
-      @media(max-width:900px){
-        #tab-content .upload-grid{grid-template-columns:1fr!important;gap:12px!important}
-        #tab-content .thumb{height:260px!important}
-      }
-    `;
-    doc.head.appendChild(style);
+
+    if(!doc.getElementById('two-preparation-editor-tuning')){
+      const style=doc.createElement('style');
+      style.id='two-preparation-editor-tuning';
+      style.textContent=`
+        #tab-content .two-editor-hidden{display:none!important}
+        #tab-content .upload-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;margin:16px 0!important}
+        #tab-content .upl{padding:10px!important;min-width:0}
+        #tab-content .thumb{height:clamp(220px,24vw,340px)!important;padding:8px!important;background:#eef2eb!important;display:grid!important;place-items:center!important}
+        #tab-content .thumb img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;background:#f7f9f5!important;border-radius:8px!important;display:block!important}
+        #tab-content .upl label{margin-top:9px!important;font-size:11px!important}
+
+        #detailView{background:#f3f5f1!important}
+        #detailView .detail-content{max-width:1320px!important;padding:26px 34px 105px!important}
+        #detailView .hero-zone{background:#fff!important;color:#173126!important;border-radius:4px!important;border:0!important;border-left:7px solid #78be20!important;box-shadow:0 8px 26px rgba(20,52,33,.08)!important;padding:22px 26px!important;margin-bottom:22px!important}
+        #detailView .hero-zone small{color:#5b9f18!important;font-size:10px!important;letter-spacing:1.1px!important}
+        #detailView .hero-zone h3{color:#173126!important;font-size:clamp(30px,3.2vw,46px)!important;margin:7px 0 8px!important;line-height:1.05!important}
+        #detailView .hero-zone p{color:#58665d!important;font-size:15px!important;line-height:1.55!important;max-width:1050px!important}
+        #detailView .triple-compare{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:24px!important;margin:0 0 26px!important}
+        #detailView .photo-card.work{display:none!important}
+        #detailView .photo-card{border:0!important;border-radius:10px!important;box-shadow:0 7px 22px rgba(20,52,33,.08)!important;background:#fff!important}
+        #detailView .photo-card .visual{height:clamp(270px,30vw,430px)!important;background:#fff!important;display:grid!important;place-items:center!important}
+        #detailView .photo-card .visual img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;background:#fff!important;display:block!important}
+        #detailView .photo-card .label{padding:11px 15px 13px!important;border-top:1px solid #edf1ea!important}
+        #detailView .photo-card .label small{color:#6f7d73!important}
+        #detailView .photo-card .label strong{font-size:15px!important;color:#173126!important}
+        #detailView .info-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:34px!important;margin:24px 8px 0!important}
+        #detailView .info{position:relative!important;border:0!important;background:transparent!important;border-radius:0!important;padding:0 0 0 24px!important;box-shadow:none!important}
+        #detailView .info:nth-child(3){display:none!important}
+        #detailView .info:before{content:"";position:absolute;left:0;top:5px;width:9px;height:9px;border-radius:50%;background:#78be20}
+        #detailView .info .ico{display:none!important}
+        #detailView .info b{display:block!important;font-size:18px!important;line-height:1.2!important;color:#173126!important;margin-bottom:10px!important}
+        #detailView .info p{font-size:14px!important;line-height:1.6!important;color:#4d5d52!important;margin:0!important;white-space:normal!important}
+        #detailView .two-slide-points{margin:0!important;padding:0!important;list-style:none!important;display:grid!important;gap:7px!important}
+        #detailView .two-slide-points li{position:relative;padding-left:18px!important}
+        #detailView .two-slide-points li:before{content:"•";position:absolute;left:0;top:0;color:#5b9f18;font-size:18px;font-weight:900;line-height:1.2}
+        #detailView .two-slide-paragraph{display:block}
+        #detailView .detail-nav{padding:10px 34px!important}
+
+        @media(max-width:900px){
+          #tab-content .upload-grid{grid-template-columns:1fr!important;gap:12px!important}
+          #tab-content .thumb{height:280px!important}
+          #detailView .detail-content{padding:18px 14px 95px!important}
+          #detailView .triple-compare{grid-template-columns:1fr!important;gap:14px!important}
+          #detailView .photo-card .visual{height:300px!important}
+          #detailView .info-grid{grid-template-columns:1fr!important;gap:20px!important;margin:20px 4px 0!important}
+          #detailView .detail-nav{padding:10px 14px!important}
+        }
+      `;
+      doc.head.appendChild(style);
+    }
+
+    if(win&&!win.__twoLecturePowerPointPatched&&typeof win.renderDetail==='function'){
+      const originalRenderDetail=win.renderDetail;
+      win.renderDetail=function(){
+        const result=originalRenderDetail.apply(this,arguments);
+        formatLectureSlide(doc);
+        return result;
+      };
+      win.__twoLecturePowerPointPatched=true;
+    }
+
+    formatLectureSlide(doc);
   }
+
   frame.addEventListener('load',tunePreparationEditor);
   if(frame.contentDocument?.readyState==='complete')tunePreparationEditor();
 })();
