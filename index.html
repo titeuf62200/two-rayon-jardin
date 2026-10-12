@@ -11,9 +11,40 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf3e9}.tw
 </style>
 </head>
 <body>
-<iframe class="two-app-frame" src="app.html?v=20261012-1" title="TWO Rayon Jardin" allow="fullscreen"></iframe>
+<iframe class="two-app-frame" src="app.html?v=20261012-2" title="TWO Rayon Jardin" allow="fullscreen"></iframe>
 <div class="topbar auth-shellbar" aria-label="Compte TWO"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="auth.js?v=20261012-3"></script>
+<script>
+(function(){
+  const frame=document.querySelector('.two-app-frame');
+  function tunePreparationEditor(){
+    const doc=frame.contentDocument;
+    if(!doc||!doc.head)return;
+    const workUpload=doc.getElementById('fileWork')?.closest('.upl');
+    const stepsField=doc.getElementById('fSteps')?.closest('.field');
+    workUpload?.classList.add('two-editor-hidden');
+    stepsField?.classList.add('two-editor-hidden');
+    if(doc.getElementById('two-preparation-editor-tuning'))return;
+    const style=doc.createElement('style');
+    style.id='two-preparation-editor-tuning';
+    style.textContent=`
+      #tab-content .two-editor-hidden{display:none!important}
+      #tab-content .upload-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;margin:16px 0!important}
+      #tab-content .upl{padding:10px!important;min-width:0}
+      #tab-content .thumb{height:clamp(220px,24vw,340px)!important;padding:8px;background:#eef2eb!important}
+      #tab-content .thumb img{width:100%!important;height:100%!important;object-fit:contain!important;background:#f7f9f5!important;border-radius:8px}
+      #tab-content .upl label{margin-top:9px!important;font-size:11px!important}
+      @media(max-width:900px){
+        #tab-content .upload-grid{grid-template-columns:1fr!important;gap:12px!important}
+        #tab-content .thumb{height:260px!important}
+      }
+    `;
+    doc.head.appendChild(style);
+  }
+  frame.addEventListener('load',tunePreparationEditor);
+  if(frame.contentDocument?.readyState==='complete')tunePreparationEditor();
+})();
+</script>
 </body>
 </html>
