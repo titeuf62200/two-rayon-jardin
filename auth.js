@@ -78,8 +78,9 @@
 
         <div id="two-setup-pane" class="two-auth-hidden">
           <h1>Crée ton profil</h1>
-          <p>Cette inscription n’est disponible qu’une seule fois. Le premier profil créé devient le propriétaire et l’unique administrateur de TWO.</p>
+          <p>Cette inscription n’est disponible qu’une seule fois. Le premier profil validé avec ton code propriétaire devient l’unique administrateur de TWO.</p>
           <form id="two-setup-form">
+            <label class="two-auth-field"><span>Code propriétaire</span><input id="two-setup-code" type="text" autocomplete="off" required autocapitalize="characters" placeholder="TWO-XXXX-XXXX"></label>
             <label class="two-auth-field"><span>Nom / prénom</span><input id="two-setup-name" type="text" autocomplete="name" required minlength="2" placeholder="Ton nom"></label>
             <label class="two-auth-field"><span>Adresse e-mail</span><input id="two-setup-email" type="email" autocomplete="email" inputmode="email" required placeholder="ton.adresse@email.fr"></label>
             <label class="two-auth-field"><span>Mot de passe</span><input id="two-setup-password" type="password" autocomplete="new-password" required minlength="8" placeholder="8 caractères minimum"></label>
@@ -141,7 +142,7 @@
     $("#two-login-pane")?.classList.add("two-auth-hidden");
     $("#two-setup-pane")?.classList.remove("two-auth-hidden");
     if ($("#two-auth-pill")) $("#two-auth-pill").textContent = "Première installation";
-    if ($("#two-auth-foot")) $("#two-auth-foot").textContent = "Après ta création, cet écran d’inscription disparaîtra définitivement.";
+    if ($("#two-auth-foot")) $("#two-auth-foot").textContent = "Après ta création, cet écran d’inscription et le code propriétaire seront définitivement désactivés.";
   }
 
   async function handleSetup(e) {
@@ -149,6 +150,7 @@
     clearMessages();
 
     const btn = $("#two-setup-submit");
+    const bootstrap_code = $("#two-setup-code").value.trim().toUpperCase();
     const display_name = $("#two-setup-name").value.trim();
     const email = $("#two-setup-email").value.trim().toLowerCase();
     const password = $("#two-setup-password").value;
@@ -159,7 +161,7 @@
 
     setBusy(btn, true, "Création du profil…");
     try {
-      const result = await callAuth("two_bootstrap_owner", { display_name, email, password });
+      const result = await callAuth("two_bootstrap_owner", { bootstrap_code, display_name, email, password });
       ownerInitialized = true;
 
       const loginEmail = result.auth_email || await deriveAuthEmail(email);
@@ -175,7 +177,7 @@
       await acceptSession(data.session);
     } catch (error) {
       const msg = humanError(error);
-      if (/existe déjà|réservé|créé/i.test(msg)) {
+      if (/existe déjà|réservé|créé|plus disponible/i.test(msg)) {
         ownerInitialized = true;
         showLoginPane();
       }
