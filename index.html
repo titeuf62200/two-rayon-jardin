@@ -11,7 +11,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf3e9}.tw
 </style>
 </head>
 <body>
-<iframe class="two-app-frame" src="app.html?v=20261012-3" title="TWO Rayon Jardin" allow="fullscreen"></iframe>
+<iframe class="two-app-frame" src="app.html?v=20261012-4" title="TWO Rayon Jardin" allow="fullscreen"></iframe>
 <div class="topbar auth-shellbar" aria-label="Compte TWO"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="auth.js?v=20261012-3"></script>
@@ -36,9 +36,34 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf3e9}.tw
     el.innerHTML='<ul class="two-slide-points">'+cleaned.map(function(line){return '<li>'+escapeHtml(line)+'</li>'}).join('')+'</ul>';
   }
 
+  function forcePhotoFit(doc){
+    ['thumbBefore','thumbFuture','detailBefore','detailFuture'].forEach(function(id){
+      const box=doc.getElementById(id);
+      if(!box)return;
+      if(id.indexOf('thumb')===0){
+        box.style.setProperty('display','grid','important');
+        box.style.setProperty('place-items','center','important');
+        box.style.setProperty('overflow','hidden','important');
+        box.style.setProperty('background','#eef2eb','important');
+      }
+      const img=box.querySelector('img');
+      if(!img)return;
+      img.style.setProperty('width','100%','important');
+      img.style.setProperty('height','100%','important');
+      img.style.setProperty('max-width','100%','important');
+      img.style.setProperty('max-height','100%','important');
+      img.style.setProperty('object-fit','contain','important');
+      img.style.setProperty('object-position','center center','important');
+      img.style.setProperty('display','block','important');
+      img.style.setProperty('margin','auto','important');
+      img.style.setProperty('background','#f7f9f5','important');
+    });
+  }
+
   function formatLectureSlide(doc){
     formatAsPowerPointPoints(doc.getElementById('detailEconomic'));
     formatAsPowerPointPoints(doc.getElementById('detailClient'));
+    forcePhotoFit(doc);
   }
 
   function tunePreparationEditor(){
@@ -58,8 +83,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf3e9}.tw
         #tab-content .two-editor-hidden{display:none!important}
         #tab-content .upload-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;margin:16px 0!important}
         #tab-content .upl{padding:10px!important;min-width:0}
-        #tab-content .thumb{height:clamp(220px,24vw,340px)!important;padding:8px!important;background:#eef2eb!important;display:grid!important;place-items:center!important}
-        #tab-content .thumb img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;background:#f7f9f5!important;border-radius:8px!important;display:block!important}
+        #tab-content .thumb{height:clamp(220px,24vw,340px)!important;padding:8px!important;background:#eef2eb!important;display:grid!important;place-items:center!important;overflow:hidden!important}
+        #tab-content .thumb img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;background:#f7f9f5!important;border-radius:8px!important;display:block!important;margin:auto!important}
         #tab-content .upl label{margin-top:9px!important;font-size:11px!important}
 
         #detailView{background:#f3f5f1!important}
@@ -71,8 +96,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf3e9}.tw
         #detailView .triple-compare{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:24px!important;margin:0 0 26px!important}
         #detailView .photo-card.work{display:none!important}
         #detailView .photo-card{border:0!important;border-radius:10px!important;box-shadow:0 7px 22px rgba(20,52,33,.08)!important;background:#fff!important}
-        #detailView .photo-card .visual{height:clamp(270px,30vw,430px)!important;background:#fff!important;display:grid!important;place-items:center!important}
-        #detailView .photo-card .visual img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;background:#fff!important;display:block!important}
+        #detailView .photo-card .visual{height:clamp(270px,30vw,430px)!important;background:#fff!important;display:grid!important;place-items:center!important;overflow:hidden!important}
+        #detailView .photo-card .visual img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;background:#fff!important;display:block!important;margin:auto!important}
         #detailView .photo-card .label{padding:11px 15px 13px!important;border-top:1px solid #edf1ea!important}
         #detailView .photo-card .label small{color:#6f7d73!important}
         #detailView .photo-card .label strong{font-size:15px!important;color:#173126!important}
@@ -106,12 +131,31 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf3e9}.tw
       const originalRenderDetail=win.renderDetail;
       win.renderDetail=function(){
         const result=originalRenderDetail.apply(this,arguments);
-        formatLectureSlide(doc);
+        requestAnimationFrame(function(){formatLectureSlide(doc)});
         return result;
       };
       win.__twoLecturePowerPointPatched=true;
     }
 
+    if(!win.__twoPhotoFitObserver){
+      const observer=new MutationObserver(function(){
+        requestAnimationFrame(function(){
+          forcePhotoFit(doc);
+          formatLectureSlide(doc);
+        });
+      });
+      observer.observe(doc.body,{subtree:true,childList:true});
+      win.__twoPhotoFitObserver=observer;
+    }
+
+    doc.addEventListener('change',function(e){
+      if(e.target&&['fileBefore','fileFuture'].includes(e.target.id)){
+        setTimeout(function(){forcePhotoFit(doc)},50);
+        setTimeout(function(){forcePhotoFit(doc)},250);
+      }
+    },true);
+
+    forcePhotoFit(doc);
     formatLectureSlide(doc);
   }
 
