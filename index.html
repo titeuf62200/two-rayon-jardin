@@ -11,7 +11,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
 </style>
 </head>
 <body>
-<iframe class="two-app-frame" src="app.html?v=20261012-6" title="TWO Rayon Jardin" allow="fullscreen"></iframe>
+<iframe class="two-app-frame" src="app.html?v=20261012-8" title="TWO Rayon Jardin" allow="fullscreen"></iframe>
 <div class="topbar auth-shellbar" aria-label="Compte TWO"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="auth.js?v=20261012-3"></script>
@@ -30,6 +30,26 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
     link.rel='stylesheet';
     link.href='garden-theme.css?v=20261012-1';
     doc.head.appendChild(link);
+  }
+
+  function ensureMapReturn(doc){
+    const hero=doc.querySelector('#detailView .hero-zone');
+    const originalBack=doc.getElementById('detailBack');
+    if(!hero||!originalBack||doc.getElementById('twoReturnMap'))return;
+    const button=doc.createElement('button');
+    button.id='twoReturnMap';
+    button.type='button';
+    button.title='Retour au plan interactif';
+    button.setAttribute('aria-label','Retour au plan interactif');
+    button.innerHTML=`<svg viewBox="0 0 68 56" aria-hidden="true">
+      <path d="M5 11 20 5l15 6 15-6 13 6v38l-13-6-15 6-15-6-15 6Z" fill="#f2df96" stroke="#d2bd70" stroke-width="2"/>
+      <path d="M20 5v38M35 11v38M50 5v38" fill="none" stroke="#b29b55" stroke-width="1.5"/>
+      <path d="M12 34c7-12 14 4 22-5 8-9 12 5 20-4" fill="none" stroke="#0a5b3b" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 4"/>
+      <circle cx="12" cy="34" r="3" fill="#8bd629" stroke="#0a5b3b" stroke-width="1.5"/>
+      <path d="m48 17 9 9m0-9-9 9" stroke="#e55f3a" stroke-width="3" stroke-linecap="round"/>
+    </svg><span>Retour au plan</span>`;
+    button.addEventListener('click',function(){originalBack.click()});
+    hero.appendChild(button);
   }
 
   function formatAsPowerPointPoints(el){
@@ -104,6 +124,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
     formatAsPowerPointPoints(doc.getElementById('detailClient'));
     forcePhotoFit(doc);
     normalizeDetailPhotoFrames(doc);
+    ensureMapReturn(doc);
   }
 
   function tunePreparationEditor(){
@@ -112,6 +133,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
     if(!doc||!doc.head)return;
 
     injectGardenTheme(doc);
+    ensureMapReturn(doc);
 
     const workUpload=doc.getElementById('fileWork')?.closest('.upl');
     const stepsField=doc.getElementById('fSteps')?.closest('.field');
@@ -120,12 +142,24 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
 
     if(!win.__twoPresentationZoomPatched){
       const setPresentationZoom=function(){
-        if(typeof win.setPlanZoom==='function')win.setPlanZoom(100);
-        const editShell=doc.getElementById('editPlanShell');
-        if(editShell)editShell.style.width='155%';
+        const apply=function(){
+          try{if(typeof win.setPlanZoom==='function')win.setPlanZoom(100)}catch(_){ }
+          const shell=doc.getElementById('planShell');
+          const zoomTxt=doc.getElementById('zoomTxt');
+          const editShell=doc.getElementById('editPlanShell');
+          if(shell){
+            shell.style.setProperty('width','100%','important');
+            shell.style.setProperty('min-width','0','important');
+          }
+          if(zoomTxt)zoomTxt.textContent='100%';
+          if(editShell)editShell.style.width='155%';
+          try{if(typeof win.updateLensVisual==='function')requestAnimationFrame(function(){win.updateLensVisual()})}catch(_){ }
+        };
+        apply();
+        [50,180,450,1000,1800].forEach(function(ms){setTimeout(apply,ms)});
       };
       ['startPresent','presentMode','footerPresent'].forEach(function(id){
-        doc.getElementById(id)?.addEventListener('click',function(){setTimeout(setPresentationZoom,0)},false);
+        doc.getElementById(id)?.addEventListener('click',function(){setPresentationZoom()},false);
       });
       ['startEdit','editMode','footerEdit'].forEach(function(id){
         doc.getElementById(id)?.addEventListener('click',function(){
@@ -140,6 +174,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
       const style=doc.createElement('style');
       style.id='two-preparation-editor-tuning';
       style.textContent=`
+        #presentView #planShell{width:100%!important;min-width:0!important}
         #tab-content .two-editor-hidden{display:none!important}
         #tab-content .upload-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;margin:16px 0!important}
         #tab-content .upl{padding:10px!important;min-width:0}
@@ -148,16 +183,17 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
         #tab-content .upl label{margin-top:9px!important;font-size:11px!important}
 
         #detailView{overflow:hidden!important}
-        #detailView .detail-top{gap:14px!important;min-height:58px!important;padding:8px 18px!important}
-        #detailView #detailBack{width:auto!important;min-width:138px!important;height:42px!important;border-radius:999px!important;padding:0 15px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;font-size:0!important;font-weight:900!important;background:linear-gradient(135deg,#0d5b3b,#063d2b)!important;color:#fff!important;border:1px solid rgba(255,255,255,.18)!important;box-shadow:0 7px 18px rgba(6,61,43,.18)!important;white-space:nowrap!important}
-        #detailView #detailBack:before{content:"↩";font-size:18px!important;line-height:1!important;color:#b5f43b!important}
-        #detailView #detailBack:after{content:"Retour au plan";font-size:12px!important;line-height:1!important;color:#fff!important}
-        #detailView #detailBack:hover{transform:translateY(-1px);box-shadow:0 9px 22px rgba(6,61,43,.25)!important}
-        #detailView .detail-content{max-width:1480px!important;height:calc(100vh - 58px)!important;min-height:0!important;padding:12px 26px 72px!important;display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;gap:12px!important;overflow:hidden!important}
-        #detailView .hero-zone{border-radius:20px!important;padding:12px 18px!important;margin:0!important;min-height:0!important}
+        #detailView .detail-top{gap:14px!important;min-height:48px!important;padding:6px 18px!important}
+        #detailView #detailBack{display:none!important}
+        #detailView .detail-content{max-width:1480px!important;height:calc(100vh - 48px)!important;min-height:0!important;padding:12px 26px 72px!important;display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;gap:12px!important;overflow:hidden!important}
+        #detailView .hero-zone{position:relative!important;border-radius:20px!important;padding:12px 124px 12px 18px!important;margin:0!important;min-height:82px!important}
         #detailView .hero-zone small{color:#c9f99b!important;font-size:9px!important;letter-spacing:1px!important}
         #detailView .hero-zone h3{color:#fff!important;font-size:clamp(23px,2.2vw,32px)!important;margin:4px 0 5px!important;line-height:1.02!important}
         #detailView .hero-zone p{color:#dceee2!important;font-size:12px!important;line-height:1.35!important;max-width:1180px!important;margin:0!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+        #detailView #twoReturnMap{position:absolute!important;right:14px!important;top:50%!important;transform:translateY(-50%)!important;width:94px!important;height:66px!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:15px!important;background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.06))!important;box-shadow:0 7px 18px rgba(0,0,0,.16)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;color:#fff!important;padding:4px 6px!important;cursor:pointer!important;transition:transform .16s ease,background .16s ease!important}
+        #detailView #twoReturnMap:hover{transform:translateY(-50%) scale(1.035)!important;background:linear-gradient(145deg,rgba(181,244,59,.22),rgba(255,255,255,.08))!important}
+        #detailView #twoReturnMap svg{width:47px!important;height:38px!important;display:block!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.16))}
+        #detailView #twoReturnMap span{display:block!important;font-size:9px!important;line-height:1!important;font-weight:950!important;letter-spacing:.15px!important;color:#efffdc!important;white-space:nowrap!important}
         #detailView .triple-compare{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;margin:0!important;min-height:0!important;height:100%!important;align-items:stretch!important}
         #detailView .photo-card.work{display:none!important}
         #detailView .photo-card{height:100%!important;min-height:0!important;display:grid!important;grid-template-rows:minmax(0,1fr) auto!important;overflow:hidden!important;border-radius:16px!important}
@@ -180,10 +216,13 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
 
         @media(min-width:901px) and (max-height:760px){
           #detailView .detail-content{padding-top:8px!important;gap:8px!important}
-          #detailView .hero-zone{padding:8px 14px!important}
+          #detailView .hero-zone{padding:8px 112px 8px 14px!important;min-height:70px!important}
           #detailView .hero-zone small{display:none!important}
           #detailView .hero-zone h3{font-size:22px!important;margin:0 0 3px!important}
           #detailView .hero-zone p{font-size:10.5px!important;-webkit-line-clamp:1!important}
+          #detailView #twoReturnMap{width:84px!important;height:56px!important;right:10px!important}
+          #detailView #twoReturnMap svg{width:39px!important;height:31px!important}
+          #detailView #twoReturnMap span{font-size:8px!important}
           #detailView .photo-card .label{min-height:34px!important;padding:6px 10px!important}
           #detailView .info{padding:8px 11px!important}
           #detailView .info .ico{display:none!important}
@@ -192,17 +231,19 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
         }
 
         @media(max-width:900px){
+          #presentView #planShell{min-width:720px!important}
           #tab-content .upload-grid{grid-template-columns:1fr!important;gap:12px!important}
           #detailView{overflow:auto!important}
           #detailView .detail-content{height:auto!important;display:block!important;padding:14px 12px 88px!important;overflow:visible!important}
-          #detailView .hero-zone{margin-bottom:12px!important}
+          #detailView .hero-zone{margin-bottom:12px!important;padding:12px 100px 12px 14px!important;min-height:78px!important}
+          #detailView #twoReturnMap{width:76px!important;height:60px!important;right:9px!important}
+          #detailView #twoReturnMap svg{width:39px!important;height:31px!important}
+          #detailView #twoReturnMap span{font-size:8px!important}
           #detailView .triple-compare{grid-template-columns:1fr!important;gap:12px!important;height:auto!important;margin-bottom:12px!important}
           #detailView .photo-card{height:auto!important;display:block!important}
           #detailView .photo-card .visual{height:250px!important;min-height:250px!important}
           #detailView .info-grid{grid-template-columns:1fr!important;gap:10px!important}
           #detailView .detail-nav{padding:8px 12px!important}
-          #detailView #detailBack{min-width:126px!important;padding:0 12px!important}
-          #detailView #detailBack:after{font-size:11px!important}
         }
       `;
       doc.head.appendChild(style);
