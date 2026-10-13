@@ -5,30 +5,16 @@
   const frame = document.querySelector('.two-app-frame');
   if (!frame) return;
 
-  function injectPlanHighlightFix(doc) {
-    if (!doc || !doc.head || doc.getElementById('two-plan-highlight-fix')) return;
-    const script = doc.createElement('script');
-    script.id = 'two-plan-highlight-fix';
-    script.src = 'plan-highlight-fix.js?v=20261013-2';
-    script.async = false;
-    script.onerror = () => console.error('[TWO Plan] La correction de surlignage n’a pas pu être chargée.');
-    doc.head.appendChild(script);
-  }
-
   function injectPresentationEnhancements(doc, win) {
     if (!doc || !win || !doc.head) return;
-    if (doc.getElementById('two-presentation-enhancements-v2')) {
-      injectPlanHighlightFix(doc);
-      return;
-    }
+    if (doc.getElementById('two-presentation-enhancements-v2')) return;
+
     const script = doc.createElement('script');
     script.id = 'two-presentation-enhancements-v2';
     script.src = 'presentation-enhancements.js?v=20261013-1';
     script.async = false;
-    script.onload = () => injectPlanHighlightFix(doc);
     script.onerror = () => {
       console.error('[TWO Présentation] Les améliorations de lecture n’ont pas pu être chargées.');
-      injectPlanHighlightFix(doc);
     };
     doc.head.appendChild(script);
   }
@@ -47,6 +33,13 @@
     }
 
     injectPresentationEnhancements(doc, win);
+
+    // Nettoyage de sécurité : aucune case artificielle ne doit rester sur le plan.
+    try {
+      doc.querySelectorAll('.two-plan-highlight-layer, .two-lens-highlight-canvas, .two-plan-highlight')
+        .forEach(el => el.remove());
+      doc.getElementById('two-plan-highlight-fix-style')?.remove();
+    } catch (_) {}
   }
 
   async function continueAfterRecovery(doc, win) {
