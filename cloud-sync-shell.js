@@ -16,6 +16,16 @@
     doc.head.appendChild(script);
   }
 
+  async function continueAfterRecovery(doc, win) {
+    try {
+      const p = win.__twoDeepRecoveryPromise;
+      if (p && typeof p.then === 'function') await p;
+    } catch (error) {
+      console.warn('[TWO Recovery] Le scan a rencontré une erreur, poursuite de la synchronisation.', error);
+    }
+    injectMainSync(doc, win);
+  }
+
   function injectCloudSync() {
     try {
       const doc = frame.contentDocument;
@@ -24,15 +34,15 @@
       if (window.supabase) win.supabase = window.supabase;
 
       if (doc.getElementById('two-deep-recovery')) {
-        injectMainSync(doc, win);
+        continueAfterRecovery(doc, win);
         return;
       }
 
       const recovery = doc.createElement('script');
       recovery.id = 'two-deep-recovery';
-      recovery.src = 'recovery-scan.js?v=20261013-2';
+      recovery.src = 'recovery-scan.js?v=20261013-3';
       recovery.async = false;
-      recovery.onload = () => injectMainSync(doc, win);
+      recovery.onload = () => continueAfterRecovery(doc, win);
       recovery.onerror = () => {
         console.error('[TWO Recovery] Le scan approfondi n’a pas pu être chargé.');
         injectMainSync(doc, win);
