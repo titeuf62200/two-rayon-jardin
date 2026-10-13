@@ -5,16 +5,27 @@
   const frame = document.querySelector('.two-app-frame');
   if (!frame) return;
 
+  function purgeLegacyHighlights(doc) {
+    try {
+      doc.querySelectorAll('.two-plan-highlight-layer, .two-lens-highlight-viewport, .two-lens-highlight-canvas, .two-plan-highlight')
+        .forEach(el => el.remove());
+      doc.getElementById('two-plan-highlight-fix-style')?.remove();
+    } catch (_) {}
+  }
+
   function injectPresentationEnhancements(doc, win) {
     if (!doc || !win || !doc.head) return;
-    if (doc.getElementById('two-presentation-enhancements-v2')) return;
+    purgeLegacyHighlights(doc);
+    if (doc.getElementById('two-presentation-enhancements-v3')) return;
 
     const script = doc.createElement('script');
-    script.id = 'two-presentation-enhancements-v2';
-    script.src = 'presentation-enhancements.js?v=20261013-1';
+    script.id = 'two-presentation-enhancements-v3';
+    script.src = 'presentation-enhancements.js?v=20261013-3';
     script.async = false;
+    script.onload = () => purgeLegacyHighlights(doc);
     script.onerror = () => {
       console.error('[TWO Présentation] Les améliorations de lecture n’ont pas pu être chargées.');
+      purgeLegacyHighlights(doc);
     };
     doc.head.appendChild(script);
   }
@@ -22,6 +33,8 @@
   function injectMainSync(doc, win) {
     if (!doc || !win || !doc.head) return;
     if (window.supabase) win.supabase = window.supabase;
+
+    purgeLegacyHighlights(doc);
 
     if (!doc.getElementById('two-cloud-sync-frame')) {
       const script = doc.createElement('script');
@@ -33,13 +46,7 @@
     }
 
     injectPresentationEnhancements(doc, win);
-
-    // Nettoyage de sécurité : aucune case artificielle ne doit rester sur le plan.
-    try {
-      doc.querySelectorAll('.two-plan-highlight-layer, .two-lens-highlight-canvas, .two-plan-highlight')
-        .forEach(el => el.remove());
-      doc.getElementById('two-plan-highlight-fix-style')?.remove();
-    } catch (_) {}
+    [50, 200, 600, 1500].forEach(ms => setTimeout(() => purgeLegacyHighlights(doc), ms));
   }
 
   async function continueAfterRecovery(doc, win) {
@@ -58,6 +65,7 @@
       const win = frame.contentWindow;
       if (!doc || !win || !doc.head) return;
       if (window.supabase) win.supabase = window.supabase;
+      purgeLegacyHighlights(doc);
 
       if (doc.getElementById('two-deep-recovery')) {
         continueAfterRecovery(doc, win);
