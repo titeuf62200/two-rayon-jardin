@@ -5,15 +5,30 @@
   const frame = document.querySelector('.two-app-frame');
   if (!frame) return;
 
-  function injectMainSync(doc, win) {
-    if (!doc || !win || !doc.head || doc.getElementById('two-cloud-sync-frame')) return;
-    if (window.supabase) win.supabase = window.supabase;
+  function injectPresentationEnhancements(doc, win) {
+    if (!doc || !win || !doc.head || doc.getElementById('two-presentation-enhancements-v2')) return;
     const script = doc.createElement('script');
-    script.id = 'two-cloud-sync-frame';
-    script.src = 'cloud-sync-frame.js?v=20261013-2';
+    script.id = 'two-presentation-enhancements-v2';
+    script.src = 'presentation-enhancements.js?v=20261013-1';
     script.async = false;
-    script.onerror = () => console.error('[TWO Cloud] Le module de sauvegarde n’a pas pu être chargé.');
+    script.onerror = () => console.error('[TWO Présentation] Les améliorations de lecture n’ont pas pu être chargées.');
     doc.head.appendChild(script);
+  }
+
+  function injectMainSync(doc, win) {
+    if (!doc || !win || !doc.head) return;
+    if (window.supabase) win.supabase = window.supabase;
+
+    if (!doc.getElementById('two-cloud-sync-frame')) {
+      const script = doc.createElement('script');
+      script.id = 'two-cloud-sync-frame';
+      script.src = 'cloud-sync-frame.js?v=20261013-2';
+      script.async = false;
+      script.onerror = () => console.error('[TWO Cloud] Le module de sauvegarde n’a pas pu être chargé.');
+      doc.head.appendChild(script);
+    }
+
+    injectPresentationEnhancements(doc, win);
   }
 
   async function continueAfterRecovery(doc, win) {
