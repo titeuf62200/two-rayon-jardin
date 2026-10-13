@@ -11,7 +11,7 @@
   (async () => {
     try {
       await load('auth-core.js?v=20261012-3');
-      await load('cloud-sync-shell.js?v=20261013-3');
+      await load('cloud-sync-shell.js?v=20261013-4');
     } catch (error) {
       console.error('[TWO] Impossible de charger les modules de connexion/sauvegarde.', error);
     }
