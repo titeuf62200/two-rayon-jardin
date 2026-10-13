@@ -30,21 +30,40 @@
     doc.head.appendChild(script);
   }
 
+  function injectCloudFrame(doc) {
+    if (doc.getElementById('two-cloud-sync-frame')) return;
+    const script = doc.createElement('script');
+    script.id = 'two-cloud-sync-frame';
+    script.src = 'cloud-sync-frame.js?v=20261013-2';
+    script.async = false;
+    script.onerror = () => console.error('[TWO Cloud] Le module de sauvegarde n’a pas pu être chargé.');
+    doc.head.appendChild(script);
+  }
+
+  function injectPendingGuardThenCloud(doc) {
+    if (doc.getElementById('two-pending-save-guard')) {
+      injectCloudFrame(doc);
+      return;
+    }
+
+    const guard = doc.createElement('script');
+    guard.id = 'two-pending-save-guard';
+    guard.src = 'pending-save-guard.js?v=20261013-1';
+    guard.async = false;
+    guard.onload = () => injectCloudFrame(doc);
+    guard.onerror = () => {
+      console.error('[TWO Safety] Le garde-fou de sauvegarde n’a pas pu être chargé.');
+      injectCloudFrame(doc);
+    };
+    doc.head.appendChild(guard);
+  }
+
   function injectMainSync(doc, win) {
     if (!doc || !win || !doc.head) return;
     if (window.supabase) win.supabase = window.supabase;
 
     purgeLegacyHighlights(doc);
-
-    if (!doc.getElementById('two-cloud-sync-frame')) {
-      const script = doc.createElement('script');
-      script.id = 'two-cloud-sync-frame';
-      script.src = 'cloud-sync-frame.js?v=20261013-2';
-      script.async = false;
-      script.onerror = () => console.error('[TWO Cloud] Le module de sauvegarde n’a pas pu être chargé.');
-      doc.head.appendChild(script);
-    }
-
+    injectPendingGuardThenCloud(doc);
     injectPresentationEnhancements(doc, win);
     [50, 200, 600, 1500].forEach(ms => setTimeout(() => purgeLegacyHighlights(doc), ms));
   }
