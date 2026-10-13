@@ -1,18 +1,23 @@
 (() => {
-  if (window.__twoPresentationEnhancementsV2) return;
-  window.__twoPresentationEnhancementsV2 = true;
+  if (window.__twoPresentationEnhancementsV3) return;
+  window.__twoPresentationEnhancementsV3 = true;
 
-  const HIGHLIGHTS = [
-    { label: 'Pulvérisateur', x: 56.1, y: 7.4, w: 8.3, h: 4.8 },
-    { label: 'Tuyau PVC',     x: 65.0, y: 7.4, w: 8.4, h: 4.8 },
-    { label: 'Tuyau',         x: 72.8, y: 16.3, w: 6.8, h: 4.8 }
-  ];
-  const LENS_ZOOM = 2.25;
+  function purgeLegacyHighlights() {
+    try {
+      document.querySelectorAll(
+        '.two-plan-highlight-layer, .two-lens-highlight-viewport, .two-lens-highlight-canvas, .two-plan-highlight'
+      ).forEach(el => el.remove());
+      document.getElementById('two-plan-highlight-fix-style')?.remove();
+    } catch (_) {}
+  }
 
   function addStyles() {
-    if (document.getElementById('two-presentation-enhancements-v2-style')) return;
-    const style = document.createElement('style');
-    style.id = 'two-presentation-enhancements-v2-style';
+    let style = document.getElementById('two-presentation-enhancements-v3-style');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'two-presentation-enhancements-v3-style';
+      document.head.appendChild(style);
+    }
     style.textContent = `
       #detailView{overflow:auto!important}
       #detailView .detail-content{height:auto!important;min-height:calc(100vh - 48px)!important;overflow:visible!important;grid-template-rows:auto auto auto!important;padding-bottom:82px!important}
@@ -33,20 +38,18 @@
       #detailView .two-impact-list{list-style:none!important;margin:0!important;padding:0!important;display:grid!important;gap:8px!important}
       #detailView .two-impact-list li{position:relative!important;padding-left:22px!important;margin:0!important}
       #detailView .two-impact-list li::before{content:'✱'!important;position:absolute!important;left:0!important;top:.04em!important;color:#78be20!important;font-size:.9em!important;font-weight:950!important;line-height:1.35!important}
-      #detailView .two-impact-client .two-impact-list li::before{color:#2f78b7!important}
+      #detailView .info.two-impact-client .two-impact-list li::before{color:#2f78b7!important}
       #detailView .two-impact-paragraph{display:block!important}
 
       #detailView .two-plan-icon{margin-left:auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-width:94px!important;height:40px!important;padding:0 12px!important;border:0!important;border-radius:12px!important;background:#173c2b!important;color:#fff!important;font-weight:950!important;font-size:13px!important;box-shadow:0 5px 14px rgba(18,55,35,.18)!important}
       #detailView .two-plan-icon svg{width:21px!important;height:21px!important;display:block!important}
       #detailView .two-plan-bottom{flex:.72!important;background:#78be20!important;color:#15341f!important}
 
-      .two-plan-highlight-layer{position:absolute;inset:0;pointer-events:none;z-index:6;line-height:1}
-      .two-plan-highlight{position:absolute;display:flex;align-items:center;justify-content:center;background:#1f6fb2;border:2px solid #15538a;border-radius:2px;color:#fff;font-family:Arial,Helvetica,sans-serif;font-weight:800;text-align:center;line-height:1.05;letter-spacing:.01em;box-shadow:0 1px 2px rgba(0,0,0,.16);padding:2px 3px;overflow:hidden}
-      #planShell>.two-plan-highlight-layer .two-plan-highlight,#editPlanShell>.two-plan-highlight-layer .two-plan-highlight{font-size:clamp(6px,.72vw,12px)}
-      .two-lens-highlight-viewport{position:absolute;inset:0;border-radius:50%;overflow:hidden;pointer-events:none;z-index:1}
-      .two-lens-highlight-canvas{position:absolute;pointer-events:none;line-height:1}
-      .two-lens-highlight-canvas .two-plan-highlight{font-size:17px;border-width:3px;padding:3px 5px}
-      #lens .lens-badge{z-index:3}
+      /* Interdit explicitement les anciennes surcouches générées sur le plan. */
+      .two-plan-highlight-layer,
+      .two-lens-highlight-viewport,
+      .two-lens-highlight-canvas,
+      .two-plan-highlight{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 
       @media(max-width:900px){
         #detailView .info-grid{grid-template-columns:1fr!important;gap:12px!important}
@@ -58,7 +61,6 @@
         #detailView .photo-card .visual{height:280px!important}
       }
     `;
-    document.head.appendChild(style);
   }
 
   function escapeHtml(value) {
@@ -99,9 +101,7 @@
     const el = document.getElementById(id);
     if (!el) return;
     const card = el.closest('.info');
-    if (card) {
-      card.classList.add('two-impact-card', type === 'economic' ? 'two-impact-economic' : 'two-impact-client');
-    }
+    if (card) card.classList.add('two-impact-card', type === 'economic' ? 'two-impact-economic' : 'two-impact-client');
 
     const source = String(value ?? '').trim();
     const key = `${type}:${source}`;
@@ -118,20 +118,12 @@
     el.dataset.twoImpactRendered = key;
   }
 
-  function enhanceDetail() {
-    const zone = currentZone();
-    const economic = zone?.economic ?? document.getElementById('detailEconomic')?.textContent ?? '';
-    const client = zone?.client ?? document.getElementById('detailClient')?.textContent ?? '';
-    renderImpactField('detailEconomic', economic, 'economic');
-    renderImpactField('detailClient', client, 'client');
-    ensurePlanButtons();
-  }
-
   function mapSvg() {
     return `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m15 5.1-6-2.1-6 2.1v15.8l6-2.1 6 2.1 6-2.1V3.1L15 5.1Zm-1 13.4-4-1.4V5.5l4 1.4v11.6Zm-9 .9V6.6l3-1.1v11.8l-3 1.1Zm14-2.1-3 1.1V6.6l3-1.1v11.8Z"/></svg>`;
   }
 
   function returnToPlan() {
+    purgeLegacyHighlights();
     const detail = document.getElementById('detailView');
     const welcome = document.getElementById('welcome');
     const present = document.getElementById('presentView');
@@ -147,6 +139,7 @@
     editor?.classList.add('hidden');
 
     const apply = () => {
+      purgeLegacyHighlights();
       try { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch (_) {}
       if (viewport) viewport.scrollTop = 0;
       if (shell) {
@@ -162,7 +155,6 @@
       }
       try { if (typeof renderPresentHotspots === 'function') renderPresentHotspots(); } catch (_) {}
       try { if (typeof centerMagnifier === 'function') centerMagnifier(); } catch (_) {}
-      syncLensOverlay();
     };
 
     requestAnimationFrame(apply);
@@ -197,66 +189,14 @@
     }
   }
 
-  function buildHighlight(parent, item) {
-    const el = document.createElement('div');
-    el.className = 'two-plan-highlight';
-    el.textContent = item.label;
-    el.style.left = `${item.x}%`;
-    el.style.top = `${item.y}%`;
-    el.style.width = `${item.w}%`;
-    el.style.height = `${item.h}%`;
-    parent.appendChild(el);
-  }
-
-  function ensurePlanHighlightLayer(shellId) {
-    const shell = document.getElementById(shellId);
-    if (!shell) return null;
-    let layer = shell.querySelector(':scope > .two-plan-highlight-layer');
-    if (!layer) {
-      layer = document.createElement('div');
-      layer.className = 'two-plan-highlight-layer';
-      HIGHLIGHTS.forEach(item => buildHighlight(layer, item));
-      shell.appendChild(layer);
-    }
-    return layer;
-  }
-
-  function ensureLensOverlay() {
-    const lens = document.getElementById('lens');
-    if (!lens) return null;
-    let viewport = lens.querySelector('.two-lens-highlight-viewport');
-    if (!viewport) {
-      viewport = document.createElement('div');
-      viewport.className = 'two-lens-highlight-viewport';
-      const canvas = document.createElement('div');
-      canvas.className = 'two-lens-highlight-canvas';
-      HIGHLIGHTS.forEach(item => buildHighlight(canvas, item));
-      viewport.appendChild(canvas);
-      lens.insertBefore(viewport, lens.firstChild);
-    }
-    return viewport.querySelector('.two-lens-highlight-canvas');
-  }
-
-  function syncLensOverlay() {
-    const shell = document.getElementById('planShell');
-    const lens = document.getElementById('lens');
-    const canvas = ensureLensOverlay();
-    if (!shell || !lens || !canvas) return;
-    const r = shell.getBoundingClientRect();
-    if (!r.width || !r.height) return;
-
-    let x = Number.parseFloat(lens.style.left);
-    let y = Number.parseFloat(lens.style.top);
-    if (!Number.isFinite(x) || !Number.isFinite(y)) {
-      const lr = lens.getBoundingClientRect();
-      x = lr.left - r.left + lr.width / 2;
-      y = lr.top - r.top + lr.height / 2;
-    }
-
-    canvas.style.width = `${r.width * LENS_ZOOM}px`;
-    canvas.style.height = `${r.height * LENS_ZOOM}px`;
-    canvas.style.left = `${-(x * LENS_ZOOM - lens.offsetWidth / 2)}px`;
-    canvas.style.top = `${-(y * LENS_ZOOM - lens.offsetHeight / 2)}px`;
+  function enhanceDetail() {
+    const zone = currentZone();
+    const economic = zone?.economic ?? document.getElementById('detailEconomic')?.textContent ?? '';
+    const client = zone?.client ?? document.getElementById('detailClient')?.textContent ?? '';
+    renderImpactField('detailEconomic', economic, 'economic');
+    renderImpactField('detailClient', client, 'client');
+    ensurePlanButtons();
+    purgeLegacyHighlights();
   }
 
   function patchZoomButtons() {
@@ -264,14 +204,14 @@
     if (!shell) return;
     ['zoomMinus','zoomPlus'].forEach(id => {
       const button = document.getElementById(id);
-      if (!button || button.dataset.twoZoomFixed) return;
-      button.dataset.twoZoomFixed = '1';
+      if (!button || button.dataset.twoZoomFixedV3) return;
+      button.dataset.twoZoomFixedV3 = '1';
       button.addEventListener('click', () => {
         requestAnimationFrame(() => {
+          purgeLegacyHighlights();
           const value = Number.parseInt(document.getElementById('zoomTxt')?.textContent, 10) || 100;
           shell.style.setProperty('width', `${value}%`, 'important');
           shell.style.setProperty('min-width', value <= 100 ? '0' : '850px', 'important');
-          syncLensOverlay();
         });
       });
     });
@@ -280,7 +220,7 @@
   function installObservers() {
     try { window.__twoPhotoFitObserver?.disconnect?.(); } catch (_) {}
 
-    if (typeof renderDetail === 'function' && !window.__twoImpactRenderWrapped) {
+    if (typeof renderDetail === 'function' && !window.__twoImpactRenderWrappedV3) {
       const previous = renderDetail;
       window.renderDetail = function () {
         const result = previous.apply(this, arguments);
@@ -288,30 +228,37 @@
         setTimeout(enhanceDetail, 30);
         return result;
       };
-      window.__twoImpactRenderWrapped = true;
+      window.__twoImpactRenderWrappedV3 = true;
     }
 
-    const lens = document.getElementById('lens');
-    const shell = document.getElementById('planShell');
-    const observer = new MutationObserver(() => requestAnimationFrame(syncLensOverlay));
-    if (lens) observer.observe(lens, { attributes: true, attributeFilter: ['style','class'] });
-    if (shell) observer.observe(shell, { attributes: true, attributeFilter: ['style','class'] });
-    window.addEventListener('resize', () => requestAnimationFrame(syncLensOverlay));
-    lens?.addEventListener('pointermove', () => requestAnimationFrame(syncLensOverlay), { passive: true });
+    if (!window.__twoLegacyHighlightPurgeObserver) {
+      let queued = false;
+      const observer = new MutationObserver(() => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          purgeLegacyHighlights();
+        });
+      });
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+      window.__twoLegacyHighlightPurgeObserver = observer;
+    }
 
     const detailObserver = new MutationObserver(() => requestAnimationFrame(enhanceDetail));
     const detail = document.getElementById('detailView');
     if (detail) detailObserver.observe(detail, { childList: true, subtree: true });
+
+    window.addEventListener('resize', purgeLegacyHighlights, { passive: true });
+    document.getElementById('lens')?.addEventListener('pointermove', purgeLegacyHighlights, { passive: true });
   }
 
+  purgeLegacyHighlights();
   addStyles();
   ensurePlanButtons();
-  ensurePlanHighlightLayer('planShell');
-  ensurePlanHighlightLayer('editPlanShell');
-  ensureLensOverlay();
   patchZoomButtons();
   installObservers();
   enhanceDetail();
-  requestAnimationFrame(syncLensOverlay);
-  setTimeout(syncLensOverlay, 250);
+  requestAnimationFrame(purgeLegacyHighlights);
+  [50, 150, 350, 800, 1500, 3000].forEach(ms => setTimeout(purgeLegacyHighlights, ms));
 })();
