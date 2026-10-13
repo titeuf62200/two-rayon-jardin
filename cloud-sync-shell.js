@@ -9,7 +9,7 @@
     if (!doc || !doc.head || doc.getElementById('two-plan-highlight-fix')) return;
     const script = doc.createElement('script');
     script.id = 'two-plan-highlight-fix';
-    script.src = 'plan-highlight-fix.js?v=20261013-1';
+    script.src = 'plan-highlight-fix.js?v=20261013-2';
     script.async = false;
     script.onerror = () => console.error('[TWO Plan] La correction de surlignage n’a pas pu être chargée.');
     doc.head.appendChild(script);
