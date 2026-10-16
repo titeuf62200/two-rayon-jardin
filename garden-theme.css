@@ -1,43 +1,44 @@
 @import url("garden-theme-original.css?v=20261016-postit1");
 
-/* Ajout 16/10/2026 — mémo Enjeux du rayon Jardin 2027 sur le plan de présentation */
+/* Mémo Enjeux du rayon Jardin 2027 — format compact, net et lisible */
 #presentView #planShell::before{
   content:"";
   position:absolute;
   z-index:11;
-  right:.8%;
-  bottom:.9%;
-  width:43%;
+  right:2.4%;
+  bottom:3.1%;
+  width:31.5%;
   aspect-ratio:4 / 3;
   box-sizing:border-box;
-  padding:.25%;
+  padding:.42%;
   pointer-events:none;
   border:1px solid rgba(176,147,55,.42);
   border-radius:4px 9px 5px 8px;
   background-color:#fff4b8;
-  background-image:url("enjeux-rayon-jardin-2027.svg?v=20261016-hd4");
+  background-image:url("enjeux-rayon-jardin-2027.svg?v=20261016-compact-hd1");
   background-repeat:no-repeat;
   background-position:center;
-  background-size:calc(100% - 4px) calc(100% - 4px);
+  background-size:calc(100% - 6px) calc(100% - 6px);
   image-rendering:auto;
   box-shadow:
-    0 16px 30px rgba(43,52,31,.26),
-    0 3px 8px rgba(43,52,31,.18),
-    inset 0 0 0 1px rgba(255,255,255,.34);
-  transform:none;
+    0 14px 26px rgba(43,52,31,.25),
+    0 3px 7px rgba(43,52,31,.18),
+    inset 0 0 0 1px rgba(255,255,255,.36);
+  transform:rotate(-1.2deg);
+  transform-origin:center center;
   filter:none;
   backface-visibility:hidden;
 }
 
-/* Punaise rouge : au-dessus du post-it, sous la loupe. */
+/* Punaise rouge au-dessus du post-it */
 #presentView #planShell::after{
   content:"";
   position:absolute;
   z-index:12;
-  top:55.5%;
-  right:22.2%;
-  width:2%;
-  min-width:11px;
+  top:63.0%;
+  right:18.1%;
+  width:1.9%;
+  min-width:10px;
   aspect-ratio:1;
   pointer-events:none;
   border-radius:50%;
@@ -47,20 +48,22 @@
     0 4px 6px rgba(55,31,24,.34),
     inset -2px -2px 3px rgba(86,18,12,.24),
     inset 2px 2px 3px rgba(255,255,255,.34);
+  transform:rotate(-8deg);
 }
 
 @media (max-width:900px){
   #presentView #planShell::before{
-    right:.6%;
-    bottom:1.4%;
-    width:45%;
-    padding:.2%;
-    background-size:calc(100% - 3px) calc(100% - 3px);
+    right:1.8%;
+    bottom:2.5%;
+    width:33.5%;
+    padding:.45%;
+    background-size:calc(100% - 5px) calc(100% - 5px);
+    transform:rotate(-1deg);
   }
   #presentView #planShell::after{
-    top:53.2%;
-    right:23.1%;
-    width:2.35%;
-    min-width:10px;
+    top:60.8%;
+    right:18.1%;
+    width:2.2%;
+    min-width:9px;
   }
 }
