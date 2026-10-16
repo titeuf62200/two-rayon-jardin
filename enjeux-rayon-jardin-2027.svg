@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1152" viewBox="0 0 1536 1152">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fbfff8"/><stop offset="1" stop-color="#f1f6e8"/></linearGradient>
+  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#0b6a43"/><stop offset="1" stop-color="#0a5638"/></linearGradient>
+  <linearGradient id="g2" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#6bb52a"/><stop offset="1" stop-color="#8bc83d"/></linearGradient>
+  <linearGradient id="foot" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#08472f"/><stop offset="1" stop-color="#0c5a39"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#183c2a" flood-opacity=".16"/></filter>
+  <style>
+    .t{font-family:Arial,Helvetica,sans-serif;fill:#111}.w{fill:#fff}.muted{fill:#66756b}.green{fill:#0b5a3b}.lime{fill:#76ba2a}.small{font-size:20px}.tiny{font-size:17px}.med{font-size:26px}.big{font-size:40px;font-weight:800}.h{font-size:52px;font-weight:900;letter-spacing:1px}.b{font-weight:800}.card{fill:#fff;stroke:#d8e5d1;stroke-width:2}.band{fill:#eef8dc}.badge{fill:#dff0c9}.obj{fill:#0c6a43}.rule{stroke:#bccbb5;stroke-width:2}.leaf{fill:#6ebc22}
+  </style>
+</defs>
+<rect width="1536" height="1152" rx="28" fill="url(#bg)"/>
+<path d="M0 0h240c-30 54-71 88-130 99C64 107 28 92 0 70Z" fill="#f1f8e9"/>
+<path d="M1536 0h-250c27 55 70 88 130 102 50 10 90-5 120-35Z" fill="#f1f8e9"/>
+<g opacity=".92"><ellipse cx="55" cy="50" rx="18" ry="40" transform="rotate(-42 55 50)" class="leaf"/><ellipse cx="95" cy="36" rx="16" ry="34" transform="rotate(-25 95 36)" class="leaf"/><ellipse cx="1450" cy="40" rx="18" ry="38" transform="rotate(38 1450 40)" class="leaf"/><ellipse cx="1492" cy="58" rx="16" ry="32" transform="rotate(25 1492 58)" class="leaf"/></g>
+<text x="768" y="78" text-anchor="middle" class="h green">ENJEUX DU RAYON JARDIN 2027</text>
+<rect x="512" y="92" width="512" height="44" rx="22" fill="#f8e9b9"/><text x="768" y="122" text-anchor="middle" class="med b green">Synthèse des priorités au 16/10</text>
+
+<rect x="20" y="148" width="742" height="58" rx="18" fill="url(#g1)"/><text x="60" y="188" class="big w">▰ Enjeux chiffre d’affaires</text>
+<rect x="774" y="148" width="742" height="58" rx="18" fill="url(#g2)"/><text x="816" y="188" class="big w">◒ Enjeux marge / image rayon</text>
+
+<!-- LEFT 1 -->
+<g filter="url(#shadow)"><rect x="20" y="220" width="742" height="260" rx="20" class="card"/></g>
+<ellipse cx="53" cy="255" rx="12" ry="26" transform="rotate(45 53 255)" class="leaf"/><text x="82" y="266" class="big t">Nettoyeur haute pression</text>
+<rect x="34" y="286" width="128" height="38" rx="10" class="badge"/><text x="98" y="312" text-anchor="middle" class="small b t">2026</text>
+<text x="182" y="312" class="small t">CA <tspan class="b">101 000 €</tspan></text><text x="386" y="312" class="small t">Marge <tspan class="b">4,8 %</tspan></text><text x="578" y="312" class="small t"><tspan class="b">132e</tspan> rang société</text>
+<rect x="34" y="338" width="128" height="40" rx="10" class="obj"/><text x="98" y="365" text-anchor="middle" class="small b w">Objectif 2027</text>
+<text x="182" y="365" class="small t">CA <tspan class="b">150 000 €</tspan></text><text x="386" y="365" class="small t">Marge <tspan class="b">5 %</tspan></text><text x="578" y="365" class="small t"><tspan class="b">100e</tspan> rang société</text>
+<rect x="34" y="398" width="714" height="58" rx="14" class="band"/><text x="62" y="436" class="med b green">↗ +49 000 € (+48,5 %)  |  +0,2 pt marge  |  +32 places</text>
+
+<!-- RIGHT 1 -->
+<g filter="url(#shadow)"><rect x="774" y="220" width="742" height="260" rx="20" class="card"/></g>
+<ellipse cx="807" cy="255" rx="12" ry="26" transform="rotate(45 807 255)" class="leaf"/><text x="836" y="266" class="big t">Outil du jardinier</text>
+<rect x="788" y="286" width="128" height="38" rx="10" class="badge"/><text x="852" y="312" text-anchor="middle" class="small b t">2026</text>
+<text x="936" y="312" class="small t">CA <tspan class="b">144 000 €</tspan></text><text x="1146" y="312" class="small t">Marge <tspan class="b">38 %</tspan></text><text x="1320" y="312" class="small t"><tspan class="b">136e</tspan> rang société</text>
+<rect x="788" y="338" width="128" height="40" rx="10" class="obj"/><text x="852" y="365" text-anchor="middle" class="small b w">Objectif 2027</text>
+<text x="936" y="365" class="small t">CA <tspan class="b">240 000 €</tspan></text><text x="1146" y="365" class="small t">Marge <tspan class="b">38 %</tspan></text><text x="1320" y="365" class="small t"><tspan class="b">100e</tspan> rang société</text>
+<rect x="788" y="398" width="714" height="58" rx="14" class="band"/><text x="816" y="436" class="med b green">↗ +96 000 € (+67 %)  |  marge stable  |  +36 places</text>
+
+<!-- LEFT 2 -->
+<g filter="url(#shadow)"><rect x="20" y="494" width="742" height="260" rx="20" class="card"/></g>
+<ellipse cx="53" cy="529" rx="12" ry="26" transform="rotate(45 53 529)" class="leaf"/><text x="82" y="540" class="big t">Robots tondeuse</text>
+<rect x="34" y="560" width="128" height="38" rx="10" class="badge"/><text x="98" y="586" text-anchor="middle" class="small b t">2026</text>
+<text x="182" y="586" class="small t">CA <tspan class="b">125 885 €</tspan></text><text x="408" y="586" class="small t">Marge <tspan class="b">-7 %</tspan></text><text x="578" y="586" class="small t"><tspan class="b">85e</tspan> rang société</text><text x="578" y="611" class="tiny muted">(-29 rangs)</text>
+<rect x="34" y="622" width="128" height="40" rx="10" class="obj"/><text x="98" y="649" text-anchor="middle" class="small b w">Objectif 2027</text>
+<text x="182" y="649" class="small t">CA <tspan class="b">186 000 €</tspan></text><text x="408" y="649" class="small t">Marge <tspan class="b">5 %</tspan></text><text x="578" y="649" class="small t"><tspan class="b">60e</tspan> rang société</text>
+<rect x="34" y="681" width="714" height="54" rx="14" class="band"/><text x="62" y="717" class="med b green">↗ +60 115 € (+48 %)  |  +12 pts marge  |  +25 places</text>
+
+<!-- RIGHT 2 -->
+<g filter="url(#shadow)"><rect x="774" y="494" width="742" height="260" rx="20" class="card"/></g>
+<ellipse cx="807" cy="529" rx="12" ry="26" transform="rotate(45 807 529)" class="leaf"/><text x="836" y="540" class="big t">Tuyau d’arrosage</text>
+<rect x="788" y="560" width="128" height="38" rx="10" class="badge"/><text x="852" y="586" text-anchor="middle" class="small b t">2026</text>
+<text x="936" y="586" class="small t">CA <tspan class="b">31 000 €</tspan></text><text x="1138" y="586" class="small t">Marge <tspan class="b">36 %</tspan></text><text x="1320" y="586" class="small t"><tspan class="b">141e</tspan> société</text>
+<text x="936" y="611" class="tiny muted">Référence : 73e société sur les pompes</text>
+<rect x="788" y="622" width="128" height="40" rx="10" class="obj"/><text x="852" y="649" text-anchor="middle" class="small b w">Objectif 2027</text>
+<text x="936" y="649" class="small t">CA <tspan class="b">45 000 €</tspan></text><text x="1138" y="649" class="small t">Marge <tspan class="b">36 %</tspan></text><text x="1320" y="649" class="small t"><tspan class="b">125e</tspan> société</text>
+<rect x="788" y="681" width="714" height="54" rx="14" class="band"/><text x="816" y="717" class="med b green">↗ +14 000 € (+45 %)  |  marge stable  |  +16 places</text>
+
+<!-- LEFT 3 -->
+<g filter="url(#shadow)"><rect x="20" y="768" width="742" height="260" rx="20" class="card"/></g>
+<ellipse cx="53" cy="803" rx="12" ry="26" transform="rotate(45 53 803)" class="leaf"/><text x="82" y="814" class="big t">Robots piscine</text>
+<rect x="34" y="834" width="128" height="38" rx="10" class="badge"/><text x="98" y="860" text-anchor="middle" class="small b t">2026</text>
+<text x="182" y="860" class="small t">CA <tspan class="b">5 000 €</tspan></text><text x="386" y="860" class="small t">Marge <tspan class="b">-5,3 %</tspan></text><text x="578" y="860" class="small t"><tspan class="b">126e</tspan> rang société</text>
+<rect x="34" y="886" width="128" height="40" rx="10" class="obj"/><text x="98" y="913" text-anchor="middle" class="small b w">Objectif 2027</text>
+<text x="182" y="913" class="small t">CA <tspan class="b">22 000 €</tspan></text><text x="386" y="913" class="small t">Marge <tspan class="b">6,5 %</tspan></text><text x="578" y="913" class="small t"><tspan class="b">92e</tspan> rang société</text><text x="386" y="936" class="tiny muted">(moyenne région)</text>
+<rect x="34" y="953" width="714" height="56" rx="14" class="band"/><text x="62" y="991" class="med b green">↗ +17 000 € (+340 %)  |  +11,8 pts marge  |  +34 places</text>
+
+<!-- RIGHT 3 -->
+<g filter="url(#shadow)"><rect x="774" y="768" width="742" height="260" rx="20" class="card"/></g>
+<ellipse cx="807" cy="803" rx="12" ry="26" transform="rotate(45 807 803)" class="leaf"/><text x="836" y="814" class="big t">Mélange et lubrifiant</text>
+<rect x="788" y="834" width="128" height="38" rx="10" class="badge"/><text x="852" y="860" text-anchor="middle" class="small b t">2026</text>
+<text x="936" y="860" class="small t">CA <tspan class="b">35 000 €</tspan></text><text x="1138" y="860" class="small t">Marge <tspan class="b">34,2 %</tspan></text><text x="1320" y="860" class="small t"><tspan class="b">93e</tspan> rang société</text><text x="1320" y="883" class="tiny muted">(perte 17 rangs)</text>
+<rect x="788" y="894" width="128" height="40" rx="10" class="obj"/><text x="852" y="921" text-anchor="middle" class="small b w">Objectif 2027</text>
+<text x="936" y="921" class="small t">CA <tspan class="b">40 000 €</tspan></text><text x="1138" y="921" class="small t">Marge <tspan class="b">34,5 %</tspan></text><text x="1320" y="921" class="small t"><tspan class="b">86e</tspan> rang société</text>
+<rect x="788" y="953" width="714" height="56" rx="14" class="band"/><text x="816" y="991" class="med b green">↗ +5 000 € (+14 %)  |  +0,3 pt marge  |  +7 places</text>
+
+<!-- FOOTER -->
+<rect x="36" y="1043" width="1464" height="86" rx="18" fill="url(#foot)"/>
+<text x="84" y="1097" class="big w">◎ Ambition globale 2027</text>
+<line x1="520" y1="1056" x2="520" y2="1116" stroke="#9bd35f" stroke-width="2" opacity=".7"/>
+<text x="570" y="1082" class="small w">CA cumulé 2026</text><text x="570" y="1110" class="med b w">442 885 €</text>
+<text x="805" y="1105" class="big w">→</text>
+<text x="884" y="1082" class="small w">Objectif CA 2027</text><text x="884" y="1110" class="med b w">683 000 €</text>
+<rect x="1195" y="1058" width="282" height="58" rx="14" fill="#eff9df"/><text x="1336" y="1083" text-anchor="middle" class="small b green">Progression visée</text><text x="1336" y="1110" text-anchor="middle" class="med b green">+240 115 € (+54 %)</text>
+</svg>
