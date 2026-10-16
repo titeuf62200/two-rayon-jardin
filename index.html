@@ -28,7 +28,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
     const link=doc.createElement('link');
     link.id='two-garden-theme';
     link.rel='stylesheet';
-    link.href='garden-theme.css?v=20261012-1';
+    link.href='garden-theme.css?v=20261016-postit-zoom1';
     doc.head.appendChild(link);
   }
 
@@ -99,6 +99,59 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
         returnToInteractivePlan(doc);
       });
       button.dataset.returnBound='1';
+    }
+  }
+
+  function ensurePrioritiesPostit(doc){
+    const shell=doc.getElementById('planShell');
+    if(!shell)return;
+
+    let postit=doc.getElementById('twoPrioritiesPostit');
+    if(!postit){
+      postit=doc.createElement('button');
+      postit.id='twoPrioritiesPostit';
+      postit.type='button';
+      postit.title='Agrandir les enjeux Jardin 2027';
+      postit.setAttribute('aria-label','Agrandir les enjeux du rayon Jardin 2027');
+      postit.innerHTML='<img src="enjeux-rayon-jardin-2027.svg?v=20261016-postit-zoom1" alt="Enjeux du rayon Jardin 2027"><span>Cliquer pour agrandir</span>';
+      shell.appendChild(postit);
+    }
+
+    let modal=doc.getElementById('twoPrioritiesModal');
+    if(!modal){
+      modal=doc.createElement('div');
+      modal.id='twoPrioritiesModal';
+      modal.className='hidden';
+      modal.setAttribute('role','dialog');
+      modal.setAttribute('aria-modal','true');
+      modal.setAttribute('aria-label','Enjeux du rayon Jardin 2027 agrandis');
+      modal.innerHTML='<div class="two-priorities-modal-card"><button type="button" class="two-priorities-close" aria-label="Fermer">×</button><img src="enjeux-rayon-jardin-2027.svg?v=20261016-postit-zoom1" alt="Enjeux du rayon Jardin 2027 en grand"></div>';
+      doc.body.appendChild(modal);
+    }
+
+    const open=function(){
+      modal.classList.remove('hidden');
+      doc.documentElement.classList.add('two-priorities-open');
+      modal.querySelector('.two-priorities-close')?.focus();
+    };
+    const close=function(){
+      modal.classList.add('hidden');
+      doc.documentElement.classList.remove('two-priorities-open');
+      try{postit.focus({preventScroll:true})}catch(_){postit.focus()}
+    };
+
+    if(!postit.dataset.zoomBound){
+      postit.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();open()});
+      postit.dataset.zoomBound='1';
+    }
+    if(!modal.dataset.zoomBound){
+      modal.addEventListener('click',function(e){
+        if(e.target===modal||e.target.closest('.two-priorities-close'))close();
+      });
+      doc.addEventListener('keydown',function(e){
+        if(e.key==='Escape'&&!modal.classList.contains('hidden'))close();
+      });
+      modal.dataset.zoomBound='1';
     }
   }
 
@@ -176,7 +229,6 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
     normalizeDetailPhotoFrames(doc);
     ensureMapReturn(doc);
   }
-
   function tunePreparationEditor(){
     const doc=frame.contentDocument;
     const win=frame.contentWindow;
@@ -184,6 +236,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#edf4e7}.tw
 
     injectGardenTheme(doc);
     ensureMapReturn(doc);
+    ensurePrioritiesPostit(doc);
 
     const workUpload=doc.getElementById('fileWork')?.closest('.upl');
     const stepsField=doc.getElementById('fSteps')?.closest('.field');
