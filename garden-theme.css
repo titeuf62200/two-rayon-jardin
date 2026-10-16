@@ -30,6 +30,7 @@
 }
 #twoPrioritiesPostit:focus-visible{outline:3px solid #8bd629;outline-offset:4px}
 #twoPrioritiesPostit img{
+  content:url("enjeux-rayon-jardin-2027-hd.webp?v=20261016-exact-hd3");
   display:block;
   width:100%;
   height:100%;
@@ -93,12 +94,14 @@
   box-shadow:0 35px 90px rgba(0,0,0,.45);
 }
 .two-priorities-modal-card img{
+  content:url("enjeux-rayon-jardin-2027-hd.webp?v=20261016-exact-hd3");
   display:block;
   width:100%;
   max-height:86vh;
   object-fit:contain;
   border-radius:14px;
   background:white;
+  image-rendering:auto;
 }
 .two-priorities-close{
   position:absolute;
