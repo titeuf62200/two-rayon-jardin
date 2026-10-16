@@ -19,11 +19,11 @@
   margin:0!important;
   border:1px solid rgba(176,147,55,.48);
   border-radius:4px 9px 5px 8px;
-  background-color:#fff2aa;
-  background-image:url("enjeux-rayon-jardin-2027.svg?v=20261016-postit-visible1");
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:calc(100% - 10px) calc(100% - 10px);
+  background-color:#fff2aa!important;
+  background-image:url("enjeux-rayon-jardin-2027-exact.webp?v=20261016-exact1")!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:calc(100% - 10px) calc(100% - 10px)!important;
   box-shadow:0 12px 24px rgba(43,52,31,.24),0 3px 7px rgba(43,52,31,.18),inset 0 0 0 1px rgba(255,255,255,.38);
   transform:rotate(-1.15deg);
   transform-origin:center center;
@@ -38,8 +38,7 @@
 }
 #twoPrioritiesPostit:focus-visible{outline:3px solid #8bd629;outline-offset:4px}
 
-/* L'image est volontairement portée par le fond du post-it :
-   cela évite les problèmes de content:url sur les balises img. */
+/* L'image exacte envoyée par l'utilisateur est affichée en fond du post-it. */
 #twoPrioritiesPostit img{display:none!important}
 
 #twoPrioritiesPostit::after{
@@ -95,11 +94,11 @@
   justify-content:center;
   padding:10px;
   border-radius:14px;
-  background-color:#fff2aa;
-  background-image:url("enjeux-rayon-jardin-2027.svg?v=20261016-postit-visible1");
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:calc(100% - 20px) calc(100% - 20px);
+  background-color:#fff2aa!important;
+  background-image:url("enjeux-rayon-jardin-2027-exact.webp?v=20261016-exact1")!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:calc(100% - 20px) calc(100% - 20px)!important;
   border:1px solid rgba(176,147,55,.46);
   box-shadow:0 22px 55px rgba(0,0,0,.30);
   transform:rotate(-.45deg);
@@ -144,12 +143,12 @@ html.two-priorities-open,html.two-priorities-open body{overflow:hidden!important
     bottom:2.1%;
     width:29%;
     padding:4px;
-    background-size:calc(100% - 8px) calc(100% - 8px);
+    background-size:calc(100% - 8px) calc(100% - 8px)!important;
     transform:rotate(-1deg);
   }
   #twoPrioritiesPostit span{display:none}
   #twoPrioritiesPostit::after{width:15px;height:15px;top:-6px}
   #twoPrioritiesModal{padding:10px}
-  .two-priorities-modal-card{width:min(78vw,680px);max-height:72vh;padding:7px;border-radius:12px;background-size:calc(100% - 14px) calc(100% - 14px)}
+  .two-priorities-modal-card{width:min(78vw,680px);max-height:72vh;padding:7px;border-radius:12px;background-size:calc(100% - 14px) calc(100% - 14px)!important}
   .two-priorities-close{right:-7px;top:-7px;width:34px;height:34px;font-size:22px;line-height:27px}
 }
