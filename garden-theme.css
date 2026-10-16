@@ -1,69 +1,137 @@
 @import url("garden-theme-original.css?v=20261016-postit1");
 
-/* Mémo Enjeux du rayon Jardin 2027 — image exacte HD, post-it agrandi */
-#presentView #planShell::before{
-  content:"";
+/* Post-it interactif Enjeux du rayon Jardin 2027 */
+#presentView #planShell::before,
+#presentView #planShell::after{display:none!important}
+
+#twoPrioritiesPostit{
   position:absolute;
-  z-index:11;
-  right:1.3%;
-  bottom:1.6%;
-  width:37%;
+  z-index:14;
+  right:2.4%;
+  bottom:3.1%;
+  width:31.5%;
   aspect-ratio:4 / 3;
   box-sizing:border-box;
-  padding:.35%;
-  pointer-events:none;
+  padding:6px;
   border:1px solid rgba(176,147,55,.42);
   border-radius:4px 9px 5px 8px;
-  background-color:#fff4b8;
-  background-image:url("enjeux-rayon-jardin-2027-hd.webp?v=20261016-exact-hd2");
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:calc(100% - 5px) calc(100% - 5px);
-  image-rendering:auto;
-  box-shadow:
-    0 15px 28px rgba(43,52,31,.25),
-    0 3px 7px rgba(43,52,31,.18),
-    inset 0 0 0 1px rgba(255,255,255,.36);
-  transform:rotate(-1.05deg);
+  background:#fff4b8;
+  box-shadow:0 14px 26px rgba(43,52,31,.25),0 3px 7px rgba(43,52,31,.18),inset 0 0 0 1px rgba(255,255,255,.36);
+  transform:rotate(-1.2deg);
   transform-origin:center center;
-  filter:none;
-  backface-visibility:hidden;
+  cursor:zoom-in;
+  overflow:visible;
+  line-height:1;
+  transition:transform .16s ease,box-shadow .16s ease;
 }
-
-/* Punaise rouge au-dessus du post-it */
-#presentView #planShell::after{
+#twoPrioritiesPostit:hover{
+  transform:rotate(-1deg) translateY(-2px) scale(1.018);
+  box-shadow:0 17px 32px rgba(43,52,31,.29),0 4px 9px rgba(43,52,31,.2);
+}
+#twoPrioritiesPostit:focus-visible{outline:3px solid #8bd629;outline-offset:4px}
+#twoPrioritiesPostit img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:2px 6px 3px 5px;
+  background:#fbfff8;
+  image-rendering:auto;
+}
+#twoPrioritiesPostit::after{
   content:"";
   position:absolute;
-  z-index:12;
-  top:58.5%;
-  right:19.7%;
-  width:1.95%;
-  min-width:10px;
-  aspect-ratio:1;
-  pointer-events:none;
+  z-index:2;
+  top:-9px;
+  left:50%;
+  width:22px;
+  height:22px;
+  transform:translateX(-50%);
   border-radius:50%;
   border:1px solid rgba(102,26,18,.48);
   background:radial-gradient(circle at 34% 28%,#ffe6df 0 14%,#f78d7d 17%,#d84a37 48%,#9c281f 78%,#762019 100%);
-  box-shadow:
-    0 4px 6px rgba(55,31,24,.34),
-    inset -2px -2px 3px rgba(86,18,12,.24),
-    inset 2px 2px 3px rgba(255,255,255,.34);
-  transform:rotate(-8deg);
+  box-shadow:0 4px 6px rgba(55,31,24,.34),inset -2px -2px 3px rgba(86,18,12,.24),inset 2px 2px 3px rgba(255,255,255,.34);
+}
+#twoPrioritiesPostit span{
+  position:absolute;
+  right:10px;
+  bottom:9px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:rgba(5,61,43,.90);
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.1px;
+  box-shadow:0 3px 8px rgba(0,0,0,.18);
 }
 
+#twoPrioritiesModal{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+  background:rgba(7,27,18,.78);
+  backdrop-filter:blur(10px);
+  line-height:1;
+}
+#twoPrioritiesModal.hidden{display:none!important}
+.two-priorities-modal-card{
+  position:relative;
+  width:min(94vw,1460px);
+  max-height:92vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  border-radius:22px;
+  background:#f8fbf5;
+  border:1px solid rgba(255,255,255,.42);
+  box-shadow:0 35px 90px rgba(0,0,0,.45);
+}
+.two-priorities-modal-card img{
+  display:block;
+  width:100%;
+  max-height:86vh;
+  object-fit:contain;
+  border-radius:14px;
+  background:white;
+}
+.two-priorities-close{
+  position:absolute;
+  z-index:3;
+  right:-13px;
+  top:-13px;
+  width:46px;
+  height:46px;
+  border:2px solid rgba(255,255,255,.85);
+  border-radius:50%;
+  background:#0a5136;
+  color:white;
+  font-size:30px;
+  font-weight:800;
+  line-height:38px;
+  box-shadow:0 8px 20px rgba(0,0,0,.28);
+  cursor:pointer;
+}
+.two-priorities-close:hover{background:#78be20;color:#173c2b}
+html.two-priorities-open,html.two-priorities-open body{overflow:hidden!important}
+
 @media (max-width:900px){
-  #presentView #planShell::before{
-    right:.8%;
-    bottom:1.4%;
-    width:39%;
-    padding:.3%;
-    background-size:calc(100% - 4px) calc(100% - 4px);
-    transform:rotate(-.9deg);
+  #twoPrioritiesPostit{
+    right:1.8%;
+    bottom:2.5%;
+    width:33.5%;
+    padding:4px;
+    transform:rotate(-1deg);
   }
-  #presentView #planShell::after{
-    top:56.2%;
-    right:20.4%;
-    width:2.2%;
-    min-width:9px;
-  }
+  #twoPrioritiesPostit span{display:none}
+  #twoPrioritiesPostit::after{width:16px;height:16px;top:-7px}
+  #twoPrioritiesModal{padding:12px}
+  .two-priorities-modal-card{width:98vw;max-height:94vh;padding:8px;border-radius:14px}
+  .two-priorities-modal-card img{max-height:90vh;border-radius:9px}
+  .two-priorities-close{right:1px;top:1px;width:40px;height:40px;font-size:26px;line-height:32px}
 }
