@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Exporter le dossier comité régional - Rayon Jardin 2027</title>
+<style>
+:root{--g:#155d3c;--dark:#123827;--bg:#f2f6f1;--ink:#1f3027;--muted:#63736a;--line:#dbe8dd;--mint:#def0e2}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--dark);color:white;padding:24px max(18px,calc((100% - 920px)/2));border-bottom:6px solid #80c66d}
+header .eyebrow{color:#a6dd97;letter-spacing:1.5px;font-weight:850;font-size:11px}h1{font-size:clamp(24px,4vw,36px);margin:9px 0}header p{color:#d5e8dd;max-width:700px;margin:0;line-height:1.5}
+main{max-width:920px;margin:25px auto;padding:0 18px 60px}.panel{background:white;border:1px solid var(--line);border-radius:17px;padding:24px;box-shadow:0 3px 14px #0a32120b;margin:0 0 17px}
+h2{font-size:19px;margin:0 0 12px}.sub{font-size:14px;color:var(--muted);line-height:1.6}.pill{display:inline-block;padding:7px 11px;border-radius:20px;background:var(--mint);color:var(--g);font-size:12px;font-weight:750;margin:0 7px 8px 0}
+button{border:0;border-radius:10px;padding:13px 17px;background:var(--g);color:white;font-size:15px;font-weight:750;cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}button.secondary{background:#e7eee8;color:var(--dark)}
+input{width:100%;padding:13px;border:1px solid #bfd3c5;border-radius:8px;font-size:15px;margin:6px 0 13px}
+label{font-size:12px;font-weight:750}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#login{display:none;max-width:500px}#progressSection{display:none}progress{width:100%;height:19px;accent-color:#0c8f53}
+#status{margin-top:15px;white-space:pre-wrap;font-size:14px;line-height:1.5}.ok{color:#146b46}.warn{color:#ac6819}.err{color:#ae3232}
+.zonegrid{display:grid;grid-template-columns:1fr 1fr;gap:9px 20px;margin-top:16px}.zone{padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+footer{color:var(--muted);font-size:12px;line-height:1.6;margin-top:18px}
+@media(max-width:600px){.panel{padding:18px}.zonegrid{grid-template-columns:1fr}main{margin-top:17px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">LEROY MERLIN CALAIS · PROJET TWO</div>
+<h1>Dossier comité régional 2027</h1>
+<p>Export PDF indépendant avec les véritables photos AVANT et les projections IA APRÈS, accompagnées des annotations économiques et des bénéfices clients sauvegardés dans TWO.</p></header>
+<main>
+<section class="panel">
+<div class="row"><span class="pill">A4 paysage</span><span class="pill">1 fiche par zone</span><span class="pill">Photos privées conservées</span></div>
+<h2>Générer le dossier illustré</h2>
+<p class="sub">Cet outil fonctionne dans ton navigateur et utilise ton accès habituel à TWO. Les images sont récupérées uniquement pendant la création du PDF, sans publication publique des photos et sans modifier les données enregistrées.</p>
+<div id="authStatus" class="sub">Vérification de ta connexion...</div>
+<div class="row" style="margin-top:16px">
+<button id="generate" disabled>Générer mon PDF avec les photos</button>
+<button id="retry" class="secondary" type="button">Actualiser la connexion</button>
+</div>
+</section>
+<section class="panel" id="login">
+<h2>Connexion à TWO</h2>
+<p class="sub">Si tu n'es pas connecté dans ce navigateur, utilise les mêmes identifiants que dans TWO. Les identifiants sont envoyés directement à Supabase et ne sont pas communiqués à ChatGPT.</p>
+<form id="loginForm">
+<label for="email">Adresse e-mail</label><input type="email" id="email" required autocomplete="username" placeholder="ton adresse de connexion TWO">
+<label for="password">Mot de passe TWO</label><input type="password" id="password" required autocomplete="current-password">
+<button type="submit" id="loginButton">Se connecter</button>
+</form>
+</section>
+<section class="panel" id="progressSection">
+<h2>Création du PDF</h2>
+<progress id="bar" max="100" value="0"></progress>
+<div id="status" aria-live="polite"></div>
+</section>
+<section class="panel">
+<h2>Contenu du dossier</h2>
+<p class="sub">L'export récupère les noms de familles et leurs commentaires depuis la dernière sauvegarde cloud du projet (plutôt qu'une liste figée). Il comprendra notamment :</p>
+<div class="zonegrid">
+<div class="zone">Nettoyeurs haute pression</div><div class="zone">Outil du jardin</div>
+<div class="zone">Corner Stihl</div><div class="zone">Robots tondeuses</div>
+<div class="zone">Phytosanitaire</div><div class="zone">Piscine, spa et pompes</div>
+<div class="zone">Terrasse</div><div class="zone">Tuyaux et arrosage</div>
+<div class="zone">Coupe-bordures</div><div class="zone">Gants et compost</div>
+</div>
+<footer>Les projections APRÈS sont des images de simulation et ne constituent pas des photographies de travaux réalisés. Le grès cérame reste signalé comme famille à documenter puisqu'aucune fiche correspondante n'a été retrouvée dans la sauvegarde consultée.</footer>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script>
+(()=>{
+'use strict';
+const URL_SB="https://oieknzurxeaiqjyzswqy.supabase.co";
+const KEY_SB="sb_publishable_aJBhD7OSkfMwMNGwZGii7A_-IfI0MO5";
+const client=window.supabase?.createClient(URL_SB,KEY_SB,{auth:{storageKey:"two-rayon-jardin-auth-v2",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const $=id=>document.getElementById(id);
+const generate=$("generate"),bar=$("bar"),status=$("status"),auth=$("authStatus"),login=$("login");
+const progressSection=$("progressSection");
+let working=false;
+function say(message,cls){status.className=cls||'';status.textContent=message}
+function progress(n,message){bar.value=Math.min(100,Math.max(0,n));say(message)}
+async function checkAuth(){
+ try{
+ if(!client)throw Error("La bibliothèque de connexion ne s'est pas chargée. Vérifie ta connexion Internet puis recharge la page.");
+ const {data,error}=await client.auth.getSession();
+ if(error)throw error;
+ if(!data.session?.access_token){
+ auth.textContent="Connexion TWO nécessaire : ouvre d'abord l'application TWO dans ce navigateur, ou connecte-toi ci-dessous.";
+ login.style.display="block";generate.disabled=true;
+ return false;
+ }
+ auth.textContent="Connexion TWO reconnue. Tu peux générer le PDF.";
+ login.style.display="none";generate.disabled=false;
+ return true;
+ }catch(e){auth.textContent="Connexion indisponible : "+String(e.message||e);generate.disabled=true;return false}
+}
+$("retry").onclick=checkAuth;
+$("loginForm").addEventListener("submit",async(e)=>{
+ e.preventDefault();const btn=$("loginButton");btn.disabled=true;
+ try{
+ const {error}=await client.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+ if(error)throw error;
+ $("password").value="";
+ await checkAuth();
+ }catch(err){auth.textContent="Échec de la connexion : "+String(err.message||err)}
+ finally{btn.disabled=false}
+});
+
+const {PDFDocument,StandardFonts,rgb}=window.PDFLib||{};
+const color={
+ forest:rgb?.(.075,.23,.16),green:rgb?.(.035,.44,.27),
+ ink:rgb?.(.11,.19,.15),muted:rgb?.(.39,.45,.41),paper:rgb?.(.96,.975,.958),
+ pale:rgb?.(.88,.95,.9),line:rgb?.(.85,.9,.86),white:rgb?.(1,1,1),blue:rgb?.(.14,.37,.51)
+};
+function clean(t){return String(t??"").replace(/\r/g,'').replace(/[\u200b-\u200d\uFEFF\u202f\u00a0]/g," ")
+ .replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/[—–−]/g,"-")
+ .replace(/[•●✓✔→]/g,"-").replace(/œ/g,"oe").replace(/Œ/g,"OE")
+ .replace(/[^\x20-\x7E\u00A1-\u00FF\n€]/g,"");}
+function text(p,txt,x,y,font,size,col){p.drawText(clean(txt),{x,y,font,size,color:col})}
+function wrap(font,raw,width,size){
+ const result=[];
+ for(const row of clean(raw).split("\n")){
+  const words=row.trim().split(/\s+/).filter(Boolean);
+  if(!words.length){result.push("");continue}
+  let line="";
+  for(const word of words){
+   const next=line?line+" "+word:word;
+   if(line&&font.widthOfTextAtSize(next,size)>width){result.push(line);line=word}
+   else line=next;
+  }
+  if(line)result.push(line)
+ }
+ return result;
+}
+function drawFit(p,font,content,x,top,width,height,settings={}){
+ let sz=settings.size||9.3,min=settings.min||7,ratio=settings.ratio||1.32,lines;
+ for(;sz>=min;sz-=.2){lines=wrap(font,content,width,sz);if(lines.length*sz*ratio<=height)break}
+ if(sz<min){sz=min;lines=wrap(font,content,width,sz)}
+ const lh=sz*ratio,maximum=Math.floor(height/lh);
+ lines.slice(0,maximum).forEach((line,i)=>{if(line)text(p,line,x,top-(i+1)*lh+3,font,sz,settings.color||color.ink)});
+ return lines.length<=maximum;
+}
+function rectangle(p,x,y,w,h,background=color.white){p.drawRectangle({x,y,width:w,height:h,color:background,borderColor:color.line,borderWidth:.8})}
+function header(p,titleText,num,font,fontBold,W,H){
+ p.drawRectangle({x:0,y:H-75,width:W,height:75,color:color.forest});
+ p.drawRectangle({x:0,y:H-75,width:7,height:75,color:rgb(.56,.82,.38)});
+ text(p,"RAYON JARDIN CALAIS  |  PERSPECTIVES 2027",25,H-22,fontBold,9,color.pale);
+ drawFit(p,fontBold,titleText,25,H-27,W-50,40,{size:21,min:15,color:color.white});
+ p.drawLine({start:{x:25,y:29},end:{x:W-25,y:29},color:color.line,thickness:1});
+ text(p,"Source : sauvegarde TWO - document de travail",25,16,font,7.3,color.muted);
+ text(p,"COMITE REGIONAL | "+String(num).padStart(2,"0"),W-167,16,fontBold,7.4,color.muted);
+}
+function drawImage(p,img,x,y,w,h){
+ const s=Math.min(w/img.width,h/img.height);
+ const iw=img.width*s,ih=img.height*s;
+ p.drawImage(img,{x:x+(w-iw)/2,y:y+(h-ih)/2,width:iw,height:ih});
+}
+async function fetchZoneImages(zones){
+ const found={}; const jobs=[];
+ for(const z of zones)for(const role of ["currentImage","futureImage"])jobs.push({z,role,path:z[role+"Path"]});
+ let cursor=0,done=0;
+ const workers=Array.from({length:Math.min(4,jobs.length)},async()=>{
+  while(cursor<jobs.length){
+   const job=jobs[cursor++];
+   const index=job.z.id+":"+job.role;
+   if(!job.path){found[index]={error:"aucun chemin sauvegardé"};done++;continue}
+   try{
+    const {data,error}=await client.storage.from("two-project-images").download(job.path);
+    if(error||!data)throw Error(error?.message||"Image absente");
+    found[index]={bytes:new Uint8Array(await data.arrayBuffer()),path:job.path};
+   }catch(err){found[index]={error:String(err.message||err),path:job.path}}
+   done++;
+   progress(8+Math.round(done/jobs.length*52),"Chargement des photos originales : "+done+" / "+jobs.length);
+  }
+ });
+ await Promise.all(workers);
+ return {found,jobs};
+}
+async function makePDF(zones,images,updatedAt){
+ if(!PDFDocument)throw Error("La bibliothèque PDF n'a pas pu être chargée.");
+ const pdf=await PDFDocument.create();
+ pdf.setTitle("Rayon Jardin Calais - Perspectives 2027 | AVANT APRES");
+ pdf.setAuthor("Leroy Merlin Calais - synthèse du projet TWO");
+ const font=await pdf.embedFont(StandardFonts.Helvetica);
+ const bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+ const W=841.89,H=595.28;
+ const page=()=>{const p=pdf.addPage([W,H]);p.drawRectangle({x:0,y:0,width:W,height:H,color:color.paper});return p};
+ const embedded={};let success=0;let checked=0;
+ for(const z of zones){
+  for(const role of ["currentImage","futureImage"]){
+   const k=z.id+":"+role; const item=images[k];checked++;
+   if(item?.bytes){
+    try{embedded[k]=await pdf.embedJpg(item.bytes);success++}
+    catch(e){item.error="JPEG non reconnu : "+String(e.message||e)}
+   }
+  }
+ }
+ // Page de couverture
+ {
+  const p=page();
+  p.drawRectangle({x:0,y:H-173,width:W,height:173,color:color.forest});
+  p.drawRectangle({x:0,y:H-173,width:8,height:173,color:rgb(.58,.82,.37)});
+  text(p,"DOSSIER DE PRESENTATION REGIONALE",32,H-40,bold,11,color.pale);
+  text(p,"Rayon Jardin 2027",32,H-101,bold,33,color.white);
+  text(p,"Leroy Merlin Calais - transformations AVANT / APRES",32,H-136,font,14,color.white);
+  rectangle(p,26,278,W-52,125);
+  text(p,"UNE FICHE PAR FAMILLE MODIFIEE",44,374,bold,11,color.green);
+  drawFit(p,font,"Les photographs actuelles des rayons, les projections IA et l'integralite des annotations sont extraites du projet TWO, via la connexion autorisee du collaborateur.",44,356,W-90,54,{size:11,min:10});
+  rectangle(p,26,79,W-52,181);
+  text(p,"LES TRANSFORMATIONS",44,233,bold,11,color.green);
+  zones.forEach((z,i)=>{
+   let x=44+(i<5?0:390),y=207-(i%5)*29;
+   text(p,String(i+1).padStart(2,"0"),x,y,bold,9,color.green);
+   drawFit(p,font,z.title||z.short||"Zone",x+26,y+10,340,18,{size:10.2,min:8});
+  });
+  text(p,"Photos AVANT : rayon reel  |  Photos APRES : simulations IA",30,51,font,9,color.muted);
+  text(p,success+" photos integrees sur "+checked+" attendues",30,30,bold,9,color.green);
+  text(p,"Dossier de travail",W-140,30,font,9,color.muted);
+ }
+ for(let i=0;i<zones.length;i++){
+  const z=zones[i],p=page(); header(p,z.title||z.short||"Zone",i+1,font,bold,W,H);
+  rectangle(p,25,462,W-50,47);
+  text(p,"TRANSFORMATION ENVISAGEE",38,494,bold,8.5,color.green);
+  drawFit(p,font,z.summary||"A completer",38,484,W-76,27,{size:9.2,min:8.1});
+  const gap=14,cardW=(W-50-gap)/2,photoY=273,photoH=176;
+  for(const [ix,role] of ["currentImage","futureImage"].entries()){
+   const x=25+ix*(cardW+gap);
+   rectangle(p,x,photoY,cardW,photoH);
+   text(p,ix===0?"AVANT  |  RAYON ACTUEL":"APRES  |  PROJECTION IA 2027",x+11,photoY+photoH-18,bold,8.4,ix===0?color.blue:color.green);
+   const img=embedded[z.id+":"+role];
+   if(img)drawImage(p,img,x+7,photoY+7,cardW-14,photoH-32);
+   else{
+    rectangle(p,x+9,photoY+9,cardW-18,photoH-39,color.paper);
+    drawFit(p,font,"Photo indisponible dans cet export. "+(images[z.id+":"+role]?.error||""),x+18,photoY+photoH-75,cardW-37,62,{size:9,min:7.3,color:color.muted});
+   }
+  }
+  const y=47,h=212,leftW=503,rightX=25+leftW+13,rightW=W-rightX-25;
+  rectangle(p,25,y,leftW,h);rectangle(p,rightX,y,rightW,h);
+  text(p,"INTERET ECONOMIQUE / PERFORMANCE",39,y+h-22,bold,9,color.green);
+  drawFit(p,font,z.economic||"Non renseigne",39,y+h-34,leftW-29,h-46,{size:8.7,min:6.7,ratio:1.3});
+  text(p,"BENEFICES CLIENTS",rightX+14,y+h-22,bold,9,color.blue);
+  drawFit(p,font,z.client||"Non renseigne",rightX+14,y+h-35,rightW-28,111,{size:8.1,min:7,ratio:1.28});
+  p.drawLine({start:{x:rightX+14,y:y+83},end:{x:rightX+rightW-14,y:y+83},color:color.line,thickness:1});
+  text(p,"ETAPES DE TRAVAUX",rightX+14,y+67,bold,8.2,color.green);
+  drawFit(p,font,z.steps&&z.steps.trim()!=="1. À compléter"?z.steps:"A preciser dans TWO",rightX+14,y+59,rightW-28,49,{size:8,min:6.9});
+  progress(64+Math.round((i+1)/zones.length*30),"Composition des fiches : "+(i+1)+" / "+zones.length);
+ }
+ // Famille mentionnee mais absente de la sauvegarde.
+ {
+  const p=page();header(p,"Gres cerame - fiche a documenter",zones.length+1,font,bold,W,H);
+  rectangle(p,26,321,W-52,154);
+  text(p,"PERIMETRE A CONFIRMER",43,440,bold,12,color.green);
+  drawFit(p,font,"Le gres cerame a ete cite pour le dossier du comite regional, mais aucune zone distincte de ce nom n'apparait dans la sauvegarde actuelle de TWO. Aucune photo, chiffre ou projection n'a ete invente : cette fiche pourra etre completee lorsque les informations seront ajoutees au projet.",43,422,W-91,84,{size:12,min:9.6});
+  text(p,"Sauvegarde cloud : "+(updatedAt||"date non disponible"),44,337,font,8.6,color.muted);
+ }
+ const bytes=await pdf.save();
+ return {bytes,success,checked};
+}
+generate.onclick=async()=>{
+ if(working)return;working=true;generate.disabled=true;progressSection.style.display="block";progress(2,"Connexion au projet TWO...");
+ try{
+  const valid=await checkAuth();if(!valid)throw Error("Il faut d'abord te connecter a TWO.");
+  const {data:row,error}=await client.from("two_project_state").select("project,updated_at").eq("project_key","rayon-jardin-2027").single();
+  if(error||!row?.project?.zones)throw Error("Sauvegarde inaccessible : "+(error?.message||"Aucune zone"));
+  const zones=row.project.zones;
+  progress(8,zones.length+" zones recuperees. Telechargement des photos...");
+  const {found}=await fetchZoneImages(zones);
+  const {bytes,success,checked}=await makePDF(zones,found,row.updated_at);
+  progress(99,"Enregistrement du document...");
+  const out=new Blob([bytes],{type:"application/pdf"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(out);
+  a.download="Rayon_Jardin_Calais_2027_AVANT_APRES_Photos.pdf";a.style.display="none";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),120000);
+  progress(100,"PDF généré et téléchargement lancé. "+success+" / "+checked+" visuels intégrés.");
+  say("PDF généré : "+zones.length+" fiches + page de couverture + fiche grès cérame.\n"+success+" photos originales intégrées sur "+checked+" visuels attendus."+(success<checked?"\nAttention : certaines photos n'ont pas pu être chargées ; vérifie ta connexion TWO et tes droits sur le stockage.":""),success===checked?"ok":"warn");
+ }catch(e){say("Impossible de générer le PDF : "+String(e.message||e),"err");console.error("[Export TWO]",e)}
+ finally{working=false;generate.disabled=false}
+};
+checkAuth();
+})();
+</script>
+</body>
+</html>
