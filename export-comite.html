@@ -24,16 +24,16 @@ footer{color:var(--muted);font-size:12px;line-height:1.6;margin-top:18px}
 </head>
 <body>
 <header><div class="eyebrow">LEROY MERLIN CALAIS · PROJET TWO</div>
-<h1>Dossier comité régional 2027</h1>
+<h1>Dossier comité régional 2027 - grands visuels</h1>
 <p>Export PDF indépendant avec les véritables photos AVANT et les projections IA APRÈS, accompagnées des annotations économiques et des bénéfices clients sauvegardés dans TWO.</p></header>
 <main>
 <section class="panel">
-<div class="row"><span class="pill">A4 paysage</span><span class="pill">1 fiche par zone</span><span class="pill">Photos privées conservées</span></div>
+<div class="row"><span class="pill">A4 paysage</span><span class="pill">Photos agrandies</span><span class="pill">1 fiche par zone</span><span class="pill">Photos privées conservées</span></div>
 <h2>Générer le dossier illustré</h2>
 <p class="sub">Cet outil fonctionne dans ton navigateur et utilise ton accès habituel à TWO. Les images sont récupérées uniquement pendant la création du PDF, sans publication publique des photos et sans modifier les données enregistrées.</p>
 <div id="authStatus" class="sub">Vérification de ta connexion...</div>
 <div class="row" style="margin-top:16px">
-<button id="generate" disabled>Générer mon PDF avec les photos</button>
+<button id="generate" disabled>Générer mon PDF avec les grandes photos</button>
 <button id="retry" class="secondary" type="button">Actualiser la connexion</button>
 </div>
 </section>
@@ -139,6 +139,33 @@ function drawFit(p,font,content,x,top,width,height,settings={}){
  lines.slice(0,maximum).forEach((line,i)=>{if(line)text(p,line,x,top-(i+1)*lh+3,font,sz,settings.color||color.ink)});
  return lines.length<=maximum;
 }
+// Synthèse de lecture : les chiffres sont prioritaires, puis les premiers arguments.
+function compactNotes(font,raw,width,height,opts={}){
+ const size=opts.size||7.5,ratio=opts.ratio||1.2,maxItems=opts.maxItems||4;
+ const bullets=clean(raw||"").split(/\n+/).map(s=>s.trim().replace(/^\d+\s*[.):-]\s*/,"").replace(/\s+/g," ")).filter(Boolean);
+ if(!bullets.length)return "";
+ const numeric=bullets.map((s,i)=>({s,i})).filter(o=>/(\d[\d., ]*\s*(?:%|€|euros?|rangs?|e\b)|\bCA\b|\bmarge\b|\bprogression\b)/i.test(o.s));
+ const ordering=[];
+ const add=(i)=>{if(i>=0 && i<bullets.length&&!ordering.includes(i))ordering.push(i)};
+ // Priorité au dernier argument chiffré, qui donne souvent la situation et l'objectif.
+ if(opts.kind==="economic"&&numeric.length)add(numeric[numeric.length-1].i);
+ add(0);add(1);
+ if(opts.kind==="client")add(2);
+ numeric.forEach(o=>add(o.i));bullets.forEach((_,i)=>add(i));
+ const maxLines=Math.floor(height/(size*ratio));
+ let picked=[],used=0;
+ for(const idx of ordering){
+  if(picked.length>=maxItems)break;
+  let candidate=bullets[idx];
+  // Le signe « ... » signale explicitement toute condensation.
+  if(candidate.length>235)candidate=candidate.slice(0,232).trimEnd()+"...";
+  let count=wrap(font,"- "+candidate,width,size).length;
+  if(used+count>maxLines)continue;
+  picked.push({idx,candidate});used+=count;
+ }
+ picked.sort((a,b)=>a.idx-b.idx);
+ return picked.map(o=>"- "+o.candidate).join("\n");
+}
 function rectangle(p,x,y,w,h,background=color.white){p.drawRectangle({x,y,width:w,height:h,color:background,borderColor:color.line,borderWidth:.8})}
 function header(p,titleText,num,font,fontBold,W,H){
  p.drawRectangle({x:0,y:H-75,width:W,height:75,color:color.forest});
@@ -221,7 +248,8 @@ async function makePDF(zones,images,updatedAt){
   rectangle(p,25,462,W-50,47);
   text(p,"TRANSFORMATION ENVISAGEE",38,494,bold,8.5,color.green);
   drawFit(p,font,z.summary||"A completer",38,484,W-76,27,{size:9.2,min:8.1});
-  const gap=14,cardW=(W-50-gap)/2,photoY=273,photoH=176;
+  // Version comité : grands visuels, environ 70 % plus hauts que la maquette initiale.
+  const gap=14,cardW=(W-50-gap)/2,photoY=153,photoH=301;
   for(const [ix,role] of ["currentImage","futureImage"].entries()){
    const x=25+ix*(cardW+gap);
    rectangle(p,x,photoY,cardW,photoH);
@@ -233,16 +261,16 @@ async function makePDF(zones,images,updatedAt){
     drawFit(p,font,"Photo indisponible dans cet export. "+(images[z.id+":"+role]?.error||""),x+18,photoY+photoH-75,cardW-37,62,{size:9,min:7.3,color:color.muted});
    }
   }
-  const y=47,h=212,leftW=503,rightX=25+leftW+13,rightW=W-rightX-25;
+  // Encarts compactés : on supprime les étapes des travaux pour privilégier les photographies.
+  const y=46,h=94,leftW=503,rightX=25+leftW+13,rightW=W-rightX-25;
   rectangle(p,25,y,leftW,h);rectangle(p,rightX,y,rightW,h);
-  text(p,"INTERET ECONOMIQUE / PERFORMANCE",39,y+h-22,bold,9,color.green);
-  drawFit(p,font,z.economic||"Non renseigne",39,y+h-34,leftW-29,h-46,{size:8.7,min:6.7,ratio:1.3});
-  text(p,"BENEFICES CLIENTS",rightX+14,y+h-22,bold,9,color.blue);
-  drawFit(p,font,z.client||"Non renseigne",rightX+14,y+h-35,rightW-28,111,{size:8.1,min:7,ratio:1.28});
-  p.drawLine({start:{x:rightX+14,y:y+83},end:{x:rightX+rightW-14,y:y+83},color:color.line,thickness:1});
-  text(p,"ETAPES DE TRAVAUX",rightX+14,y+67,bold,8.2,color.green);
-  drawFit(p,font,z.steps&&z.steps.trim()!=="1. À compléter"?z.steps:"A preciser dans TWO",rightX+14,y+59,rightW-28,49,{size:8,min:6.9});
-  progress(64+Math.round((i+1)/zones.length*30),"Composition des fiches : "+(i+1)+" / "+zones.length);
+  text(p,"INTERET ECONOMIQUE / CHIFFRES CLES",39,y+h-17,bold,8.4,color.green);
+  const economicBrief=compactNotes(font,z.economic,leftW-29,60,{size:7.5,ratio:1.19,maxItems:4,kind:"economic"});
+  drawFit(p,font,economicBrief||"Non renseigne",39,y+h-26,leftW-29,65,{size:7.5,min:7.0,ratio:1.19});
+  text(p,"BENEFICES CLIENTS / SYNTHESE",rightX+12,y+h-17,bold,8.1,color.blue);
+  const clientBrief=compactNotes(font,z.client,rightW-26,60,{size:7.4,ratio:1.18,maxItems:3,kind:"client"});
+  drawFit(p,font,clientBrief||"Non renseigne",rightX+12,y+h-26,rightW-26,65,{size:7.4,min:6.9,ratio:1.18});
+  progress(64+Math.round((i+1)/zones.length*30),"Composition des fiches grand format : "+(i+1)+" / "+zones.length);
  }
  // Famille mentionnee mais absente de la sauvegarde.
  {
