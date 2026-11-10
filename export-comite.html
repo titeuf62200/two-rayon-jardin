@@ -28,12 +28,12 @@ footer{color:var(--muted);font-size:12px;line-height:1.6;margin-top:18px}
 <p>Export PDF indépendant avec les véritables photos AVANT et les projections IA APRÈS, accompagnées des annotations économiques et des bénéfices clients sauvegardés dans TWO.</p></header>
 <main>
 <section class="panel">
-<div class="row"><span class="pill">A4 paysage</span><span class="pill">Photos agrandies</span><span class="pill">1 fiche par zone</span><span class="pill">Photos privées conservées</span></div>
+<div class="row"><span class="pill">A4 paysage</span><span class="pill">Photos XXL</span><span class="pill">1 fiche par zone</span><span class="pill">Photos privées conservées</span></div>
 <h2>Générer le dossier illustré</h2>
 <p class="sub">Cet outil fonctionne dans ton navigateur et utilise ton accès habituel à TWO. Les images sont récupérées uniquement pendant la création du PDF, sans publication publique des photos et sans modifier les données enregistrées.</p>
 <div id="authStatus" class="sub">Vérification de ta connexion...</div>
 <div class="row" style="margin-top:16px">
-<button id="generate" disabled>Générer mon PDF avec les grandes photos</button>
+<button id="generate" disabled>Générer mon PDF — version visuels XXL</button>
 <button id="retry" class="secondary" type="button">Actualiser la connexion</button>
 </div>
 </section>
@@ -245,11 +245,12 @@ async function makePDF(zones,images,updatedAt){
  }
  for(let i=0;i<zones.length;i++){
   const z=zones[i],p=page(); header(p,z.title||z.short||"Zone",i+1,font,bold,W,H);
-  rectangle(p,25,462,W-50,47);
-  text(p,"TRANSFORMATION ENVISAGEE",38,494,bold,8.5,color.green);
-  drawFit(p,font,z.summary||"A completer",38,484,W-76,27,{size:9.2,min:8.1});
-  // Version comité : grands visuels, environ 70 % plus hauts que la maquette initiale.
-  const gap=14,cardW=(W-50-gap)/2,photoY=153,photoH=301;
+  // Le résumé est réduit pour privilégier la comparaison visuelle.
+  rectangle(p,25,475,W-50,34);
+  text(p,"TRANSFORMATION ENVISAGEE",38,496,bold,8.0,color.green);
+  drawFit(p,font,z.summary||"A completer",38,487,W-76,18,{size:8.3,min:7.6,ratio:1.12});
+  // Photos géantes : chacune dispose d'une hauteur de 338 pt (plus de la moitié d'une page A4 paysage).
+  const gap=14,cardW=(W-50-gap)/2,photoY=118,photoH=338;
   for(const [ix,role] of ["currentImage","futureImage"].entries()){
    const x=25+ix*(cardW+gap);
    rectangle(p,x,photoY,cardW,photoH);
@@ -261,15 +262,15 @@ async function makePDF(zones,images,updatedAt){
     drawFit(p,font,"Photo indisponible dans cet export. "+(images[z.id+":"+role]?.error||""),x+18,photoY+photoH-75,cardW-37,62,{size:9,min:7.3,color:color.muted});
    }
   }
-  // Encarts compactés : on supprime les étapes des travaux pour privilégier les photographies.
-  const y=46,h=94,leftW=503,rightX=25+leftW+13,rightW=W-rightX-25;
+  // Bas de page limité à deux encarts brefs : aucun encart « étapes de travaux ».
+  const y=42,h=64,leftW=503,rightX=25+leftW+13,rightW=W-rightX-25;
   rectangle(p,25,y,leftW,h);rectangle(p,rightX,y,rightW,h);
-  text(p,"INTERET ECONOMIQUE / CHIFFRES CLES",39,y+h-17,bold,8.4,color.green);
-  const economicBrief=compactNotes(font,z.economic,leftW-29,60,{size:7.5,ratio:1.19,maxItems:4,kind:"economic"});
-  drawFit(p,font,economicBrief||"Non renseigne",39,y+h-26,leftW-29,65,{size:7.5,min:7.0,ratio:1.19});
-  text(p,"BENEFICES CLIENTS / SYNTHESE",rightX+12,y+h-17,bold,8.1,color.blue);
-  const clientBrief=compactNotes(font,z.client,rightW-26,60,{size:7.4,ratio:1.18,maxItems:3,kind:"client"});
-  drawFit(p,font,clientBrief||"Non renseigne",rightX+12,y+h-26,rightW-26,65,{size:7.4,min:6.9,ratio:1.18});
+  text(p,"INTERET ECONOMIQUE / CHIFFRES CLES",39,y+h-16,bold,8.1,color.green);
+  const economicBrief=compactNotes(font,z.economic,leftW-29,40,{size:7.0,ratio:1.15,maxItems:3,kind:"economic"});
+  drawFit(p,font,economicBrief||"Non renseigne",39,y+h-24,leftW-29,40,{size:7.0,min:6.7,ratio:1.15});
+  text(p,"BENEFICES CLIENTS / SYNTHESE",rightX+12,y+h-16,bold,8.0,color.blue);
+  const clientBrief=compactNotes(font,z.client,rightW-26,40,{size:7.0,ratio:1.15,maxItems:2,kind:"client"});
+  drawFit(p,font,clientBrief||"Non renseigne",rightX+12,y+h-24,rightW-26,40,{size:7.0,min:6.7,ratio:1.15});
   progress(64+Math.round((i+1)/zones.length*30),"Composition des fiches grand format : "+(i+1)+" / "+zones.length);
  }
  // Famille mentionnee mais absente de la sauvegarde.
