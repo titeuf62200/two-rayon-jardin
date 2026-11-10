@@ -28,12 +28,12 @@ footer{color:var(--muted);font-size:12px;line-height:1.6;margin-top:18px}
 <p>Export PDF indépendant avec les véritables photos AVANT et les projections IA APRÈS, accompagnées des annotations économiques et des bénéfices clients sauvegardés dans TWO.</p></header>
 <main>
 <section class="panel">
-<div class="row"><span class="pill">A4 paysage</span><span class="pill">Photos x2 (pleine page)</span><span class="pill">2 pages par zone</span><span class="pill">Photos privées conservées</span></div>
+<div class="row"><span class="pill">A4 paysage</span><span class="pill">Photos plein cadre</span><span class="pill">2 pages photo / zone</span><span class="pill">Photos privées conservées</span></div>
 <h2>Générer le dossier illustré</h2>
 <p class="sub">Cet outil fonctionne dans ton navigateur et utilise ton accès habituel à TWO. Les images sont récupérées uniquement pendant la création du PDF, sans publication publique des photos et sans modifier les données enregistrées.</p>
 <div id="authStatus" class="sub">Vérification de ta connexion...</div>
 <div class="row" style="margin-top:16px">
-<button id="generate" disabled>Générer mon PDF — photos géantes</button>
+<button id="generate" disabled>Générer mon PDF — photos plein cadre</button>
 <button id="retry" class="secondary" type="button">Actualiser la connexion</button>
 </div>
 </section>
@@ -167,14 +167,34 @@ function compactNotes(font,raw,width,height,opts={}){
  return picked.map(o=>"- "+o.candidate).join("\n");
 }
 function rectangle(p,x,y,w,h,background=color.white){p.drawRectangle({x,y,width:w,height:h,color:background,borderColor:color.line,borderWidth:.8})}
-function header(p,titleText,num,font,fontBold,W,H){
- p.drawRectangle({x:0,y:H-75,width:W,height:75,color:color.forest});
- p.drawRectangle({x:0,y:H-75,width:7,height:75,color:rgb(.56,.82,.38)});
- text(p,"RAYON JARDIN CALAIS  |  PERSPECTIVES 2027",25,H-22,fontBold,9,color.pale);
- drawFit(p,fontBold,titleText,25,H-27,W-50,40,{size:21,min:15,color:color.white});
- p.drawLine({start:{x:25,y:29},end:{x:W-25,y:29},color:color.line,thickness:1});
- text(p,"Source : sauvegarde TWO - document de travail",25,16,font,7.3,color.muted);
- text(p,"COMITE REGIONAL | "+String(num).padStart(2,"0"),W-167,16,fontBold,7.4,color.muted);
+function header(p,titleText,num,font,fontBold,W,H,role=""){
+ // Bandeau beaucoup plus discret : hauteur 48 pt au lieu de 75 pt.
+ p.drawRectangle({x:0,y:H-49,width:W,height:49,color:color.forest});
+ p.drawRectangle({x:0,y:H-49,width:5,height:49,color:rgb(.56,.82,.38)});
+ text(p,"RAYON JARDIN CALAIS  |  2027",15,H-15,fontBold,8.1,color.pale);
+ drawFit(p,fontBold,titleText,15,H-19,W-32,28,{size:16,min:11,ratio:1.16,color:color.white});
+ text(p,"Source : TWO - projet Calais",15,17,font,7,color.muted);
+ text(p,"DOSSIER REGIONAL  |  "+String(num).padStart(2,"0"),W-149,17,fontBold,7.1,color.muted);
+}
+// Conserve les proportions et remplit visuellement la feuille, avec un recadrage discret
+// uniquement lorsqu'une image très étroite laisserait trop de blanc.
+// La source JPEG n'est jamais déformée ni modifiée.
+function photoImmersive(p,img,x,y,w,h,W,H){
+ const baseScale=Math.min(w/img.width,h/img.height);
+ const baseW=img.width*baseScale,baseH=img.height*baseScale;
+ const initialCoverage=(baseW*baseH)/(W*H);
+ const targetCoverage=.53;
+ const zoom=Math.min(1.30,Math.max(1,Math.sqrt(targetCoverage/Math.max(initialCoverage,.001))));
+ const dw=baseW*zoom,dh=baseH*zoom;
+ const ix=x+(w-dw)/2,iy=y+(h-dh)/2;
+ if(zoom>1.0001){
+  p.pushOperators(PDFLib.pushGraphicsState(),PDFLib.rectangle(x,y,w,h),PDFLib.clip(),PDFLib.endPath());
+  p.drawImage(img,{x:ix,y:iy,width:dw,height:dh});
+  p.pushOperators(PDFLib.popGraphicsState());
+ }else{
+  p.drawImage(img,{x:ix,y:iy,width:dw,height:dh});
+ }
+ return {zoom,initialCoverage,coverage:(dw*dh)/(W*H)};
 }
 function drawImage(p,img,x,y,w,h){
  const s=Math.min(w/img.width,h/img.height);
@@ -231,7 +251,7 @@ async function makePDF(zones,images,updatedAt){
   text(p,"Leroy Merlin Calais - transformations AVANT / APRES",32,H-136,font,14,color.white);
   rectangle(p,26,278,W-52,125);
   text(p,"DEUX GRANDES PAGES PAR FAMILLE",44,374,bold,11,color.green);
-  drawFit(p,font,"Chaque famille occupe deux pages pour donner toute la place aux photos : le rayon actuel en grand, puis la projection IA en grand avec une breve synthese commerciale. Les images et les annotations proviennent de TWO.",44,356,W-90,54,{size:11,min:10});
+  drawFit(p,font,"Chaque famille occupe deux pages. Une page AVANT et une page APRES, avec orientation portrait ou paysage adaptee a chaque photo. La photo remplit le maximum de surface, sans deformation. Les chiffres et benefices clients sont condenses sous la projection IA.",44,356,W-90,54,{size:11,min:10});
   rectangle(p,26,79,W-52,181);
   text(p,"LES TRANSFORMATIONS",44,233,bold,11,color.green);
   zones.forEach((z,i)=>{
@@ -243,49 +263,43 @@ async function makePDF(zones,images,updatedAt){
   text(p,success+" photos integrees sur "+checked+" attendues",30,30,bold,9,color.green);
   text(p,"Dossier de travail",W-140,30,font,9,color.muted);
  }
- // Deux pages par zone pour augmenter réellement, au-delà de 2×, la surface des photos.
+ // Deux pages par zone. Orientation AUTOMATIQUE portrait/paysage selon la photo réelle.
  for(let i=0;i<zones.length;i++){
-  const z=zones[i];
-  const label=z.title||z.short||"Zone";
-  // PAGE 1 : photo AVANT quasiment pleine page, sans commentaire superflu.
-  {
-   const p=page();
-   header(p,label+"  |  AVANT",i+1,font,bold,W,H);
-   const frameX=21,frameY=57,frameW=W-42,frameH=451;
+  const z=zones[i],label=z.title||z.short||"Zone";
+  for(const role of ["currentImage","futureImage"]){
+   const before=role==="currentImage";
+   const img=embedded[z.id+":"+role];
+   // Les clichés verticaux ne sont plus enfermés dans un A4 paysage.
+   const portrait=!!img && (img.width/img.height)<1.04;
+   const pw=portrait?595.28:841.89,ph=portrait?841.89:595.28;
+   const p=pdf.addPage([pw,ph]);
+   p.drawRectangle({x:0,y:0,width:pw,height:ph,color:color.paper});
+   header(p,label+" | "+(before?"AVANT":"APRES 2027"),i+1,font,bold,pw,ph,role);
+   const frameX=14,frameY=before?37:111,frameW=pw-28,frameTop=ph-57,frameH=frameTop-frameY;
    rectangle(p,frameX,frameY,frameW,frameH);
-   text(p,"AVANT  |  RAYON ACTUEL",frameX+13,frameY+frameH-19,bold,10,color.blue);
-   const img=embedded[z.id+":currentImage"];
-   if(img)drawImage(p,img,frameX+8,frameY+8,frameW-16,frameH-38);
-   else {
-    rectangle(p,frameX+10,frameY+10,frameW-20,frameH-45,color.paper);
-    drawFit(p,font,"Photo AVANT indisponible : "+(images[z.id+":currentImage"]?.error||"aucune image"),frameX+24,frameY+frameH-77,frameW-48,60,{size:12,min:9.2,color:color.muted});
+   text(p,before?"AVANT  |  RAYON ACTUEL":"APRES  |  PROJECTION IA 2027",
+    frameX+10,frameY+frameH-16,bold,9,before?color.blue:color.green);
+   const ix=frameX+7,iy=frameY+7,iw=frameW-14,ih=frameH-29;
+   if(img)photoImmersive(p,img,ix,iy,iw,ih,pw,ph);
+   else{
+    rectangle(p,ix,iy,iw,ih,color.paper);
+    drawFit(p,font,(before?"Photo AVANT":"Projection APRES")+" indisponible : "+
+     (images[z.id+":"+role]?.error||"aucun visuel enregistré"),
+     ix+15,iy+ih-24,iw-30,75,{size:10,min:8,color:color.muted});
    }
-   // Une seule ligne de contexte; plus d'encart de travaux.
-   drawFit(p,font,z.summary||"Transformation envisagee",26,52,W-52,18,{size:8.5,min:8.0,ratio:1.08,color:color.muted});
-  }
-  // PAGE 2 : photo APRES immense, puis seulement deux encarts compacts.
-  {
-   const p=page();
-   header(p,label+"  |  APRES 2027",i+1,font,bold,W,H);
-   const frameX=21,frameY=136,frameW=W-42,frameH=372;
-   rectangle(p,frameX,frameY,frameW,frameH);
-   text(p,"APRES  |  PROJECTION IA 2027",frameX+13,frameY+frameH-19,bold,10,color.green);
-   const img=embedded[z.id+":futureImage"];
-   if(img)drawImage(p,img,frameX+8,frameY+8,frameW-16,frameH-38);
-   else {
-    rectangle(p,frameX+10,frameY+10,frameW-20,frameH-45,color.paper);
-    drawFit(p,font,"Projection APRES indisponible : "+(images[z.id+":futureImage"]?.error||"aucune image"),frameX+24,frameY+frameH-77,frameW-48,60,{size:12,min:9.2,color:color.muted});
+   if(!before){
+    // Deux encarts très courts, aucun encart étapes des travaux.
+    const y=36,h=64,gap=9,x1=14,usable=pw-28,leftW=usable*.64,rightX=x1+leftW+gap,rightW=usable-leftW-gap;
+    rectangle(p,x1,y,leftW,h);rectangle(p,rightX,y,rightW,h);
+    text(p,"INTERET ECONOMIQUE / CHIFFRES",x1+9,y+h-15,bold,7.6,color.green);
+    const e=compactNotes(font,z.economic,leftW-18,38,{size:7.1,ratio:1.18,maxItems:3,kind:"economic"});
+    drawFit(p,font,e||"Non renseigne",x1+9,y+h-23,leftW-18,38,{size:7.1,min:6.5,ratio:1.18});
+    text(p,"BENEFICES CLIENTS",rightX+8,y+h-15,bold,7.5,color.blue);
+    const c=compactNotes(font,z.client,rightW-16,38,{size:7.0,ratio:1.18,maxItems:2,kind:"client"});
+    drawFit(p,font,c||"Non renseigne",rightX+8,y+h-23,rightW-16,38,{size:7.0,min:6.4,ratio:1.18});
    }
-   const y=42,h=82,leftW=500,rightX=25+leftW+13,rightW=W-rightX-25;
-   rectangle(p,25,y,leftW,h);rectangle(p,rightX,y,rightW,h);
-   text(p,"INTERET ECONOMIQUE / CHIFFRES CLES",38,y+h-17,bold,8.7,color.green);
-   const economicBrief=compactNotes(font,z.economic,leftW-26,55,{size:7.7,ratio:1.18,maxItems:4,kind:"economic"});
-   drawFit(p,font,economicBrief||"Non renseigne",38,y+h-26,leftW-26,55,{size:7.7,min:7.0,ratio:1.18});
-   text(p,"BENEFICES CLIENTS / SYNTHESE",rightX+12,y+h-17,bold,8.5,color.blue);
-   const clientBrief=compactNotes(font,z.client,rightW-26,55,{size:7.7,ratio:1.18,maxItems:3,kind:"client"});
-   drawFit(p,font,clientBrief||"Non renseigne",rightX+12,y+h-26,rightW-26,55,{size:7.7,min:7.0,ratio:1.18});
   }
-  progress(64+Math.round((i+1)/zones.length*30),"Creation des doubles pages photo : "+(i+1)+" / "+zones.length);
+  progress(64+Math.round((i+1)/zones.length*30),"Mise en page des grandes photos : "+(i+1)+" / "+zones.length);
  }
  // Famille mentionnee mais absente de la sauvegarde.
  {
