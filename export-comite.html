@@ -325,7 +325,7 @@ generate.onclick=async()=>{
   progress(99,"Enregistrement du document...");
   const out=new Blob([bytes],{type:"application/pdf"});
   const a=document.createElement("a");a.href=URL.createObjectURL(out);
-  a.download="Rayon_Jardin_Calais_2027_AVANT_APRES_Photos.pdf";a.style.display="none";
+  a.download="Rayon_Jardin_Calais_2027_PHOTOS_PLEIN_CADRE_V4.pdf";a.style.display="none";
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),120000);
   progress(100,"PDF généré et téléchargement lancé. "+success+" / "+checked+" visuels intégrés.");
   say("PDF généré : "+zones.length+" zones (deux pages photo par zone), couverture et fiche grès cérame.\n"+success+" photos originales intégrées sur "+checked+" visuels attendus."+(success<checked?"\nAttention : certaines photos n'ont pas pu être chargées ; vérifie ta connexion TWO et tes droits sur le stockage.":""),success===checked?"ok":"warn");
